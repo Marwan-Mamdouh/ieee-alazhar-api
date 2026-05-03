@@ -1,4 +1,2 @@
-# .gitignore
-# ملفات يجب تجاهلها وعدم رفعها لـ GitHub
 node_modules/
 .env

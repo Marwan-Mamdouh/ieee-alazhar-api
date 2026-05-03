@@ -1,7 +1,5 @@
-// // authMiddleware.js (النسخة النهائية)
 // const jwt = require('jsonwebtoken');
 
-// // هذا السِر يجب أن يتم تحميله من الـ .env
 // const JWT_SECRET = process.env.JWT_SECRET; 
 
 // const authenticateToken = (req, res, next) => {

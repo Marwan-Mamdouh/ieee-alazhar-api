@@ -1,7 +1,5 @@
-// boardController.js (الكود الذي يضمن جلب جميع الرؤساء السابقين)
 const db = require('./db');
 
-// ✅ جلب بيانات كل المجالس (Officers, Technical, Branding, Operation)
 const getBoardData = async () => {
     const queryText = `
         SELECT id, name, position, image_url AS image, bio, linkedin_url AS linkedin, board_type
@@ -13,7 +11,6 @@ const getBoardData = async () => {
     try {
         const { rows } = await db.query(queryText);
         
-        // تجميع البيانات في الهيكل المطلوب للواجهة الأمامية
         const structuredData = {
             officers: rows.filter(member => member.board_type === 'officers'),
             technical: rows.filter(member => member.board_type === 'technical'),
@@ -21,7 +18,6 @@ const getBoardData = async () => {
             operation: rows.filter(member => member.board_type === 'operation'),
         };
 
-        // تنظيف: إزالة حقل board_type من الكائنات المرسلة
         Object.keys(structuredData).forEach(key => {
             structuredData[key] = structuredData[key].map(({ board_type, ...rest }) => rest);
         });
@@ -33,7 +29,6 @@ const getBoardData = async () => {
     }
 };
 
-// ✅ جلب بيانات جميع الرؤساء السابقين (Last Chairmen)
 const getLastChairman = async () => {
     const queryText = `
         SELECT id, name, position, image_url AS image, bio, linkedin_url AS linkedin
@@ -44,7 +39,6 @@ const getLastChairman = async () => {
 
     try {
         const { rows } = await db.query(queryText);
-        // 🚨 التصحيح: نُعيد المصفوفة الكاملة (rows) لكي يتم عرض جميع الأعضاء
         return rows; 
     } catch (err) {
         console.error("Database query error in getLastChairman:", err);
