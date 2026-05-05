@@ -1,5 +1,5 @@
 import type { MemberType } from "./board.types.js";
-import Board from "./model.js";
+import Board, { type BoardDocument } from "./model.js";
 import type { AddBoardMember } from "./board.schema.js";
 
 const boardService = {
@@ -11,16 +11,16 @@ const boardService = {
       .sort({ memberType: 1, _id: 1 })
       .lean()
       .exec();
-    return members.map(memberDTO);
+    return members.map(toMemberDTO);
   },
 
   addMember: async (member: AddBoardMember) => {
     const newMember = await new Board(member).save();
-    return memberDTO(newMember);
+    return toMemberDTO(newMember);
   },
 };
 
-const memberDTO = (member: AddBoardMember) => {
+const toMemberDTO = (member: BoardDocument) => {
   return {
     name: member.name,
     bio: member.bio,
