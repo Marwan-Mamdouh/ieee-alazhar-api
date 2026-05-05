@@ -1,4 +1,4 @@
-import { Router, type Request, type Response } from "express";
+import { Router, type Response } from "express";
 import { validate } from "../../middlewares/validate.js";
 import {
   addBoardMemberSchema,
@@ -9,7 +9,6 @@ import {
 import type { TypedRequest } from "../../types/TypedRequest.js";
 import asyncHandler from "../../util/async.handler.js";
 import boardService from "./board.service.js";
-import mongoose from "mongoose";
 
 const router = Router();
 router.get(
