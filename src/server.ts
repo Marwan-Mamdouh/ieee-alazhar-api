@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import compression from "compression";
-import express, { json } from "express";
+import express, { json, type Response } from "express";
 import helmet from "helmet";
 import dbConnection from "./config/db.js";
 import boardRouter from "./modules/board/board.router.js";
@@ -20,18 +20,18 @@ app.use(corsMiddleware);
 
 app.use("/api/board", boardRouter);
 
-app.get("/", (_, res) => {
+app.get("/", (_, res: Response) => {
   res.json({ status: "ok", message: "API is running ✅" });
 });
-app.use((_, res) => {
+app.use((_, res: Response) => {
   res.status(404).json({ message: "Endpoint not found." });
 });
 
 app.use(errorHandler);
 
-const PORT = process.env.PORT ?? 8080;
-app.listen(+PORT, "0.0.0.0", () => {
-  console.log(`✅ Server running on port ${PORT}`);
-});
+if (process.env.NODE_ENV !== "production") {
+  const PORT = process.env.PORT ?? 8080;
+  app.listen(+PORT, () => console.log(`✅ Server running on port ${PORT}`));
+}
 
 export default app;
