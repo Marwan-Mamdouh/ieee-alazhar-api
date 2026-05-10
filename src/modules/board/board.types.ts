@@ -6,7 +6,9 @@ export const OFFICERPOSITIONS = [
 ] as const;
 export const TECHNICALPOSITIONS = ["head", "vice"] as const;
 
-export const BOARD_POSITIONS = [...new Set([...OFFICERPOSITIONS, ...TECHNICALPOSITIONS])] as const;
+export const BOARD_POSITIONS = [
+  ...new Set([...OFFICERPOSITIONS, ...TECHNICALPOSITIONS]),
+] as const;
 
 export const BOARD_TYPES = [
   "officer",
@@ -15,8 +17,10 @@ export const BOARD_TYPES = [
   "operation",
 ] as const;
 
+export const boardMembersProps =
+  "_id name bio memberType boardYear position avatar linkedin_url" as const;
+
 export type BoardPosition = (typeof BOARD_POSITIONS)[number];
 export type MemberType = (typeof BOARD_TYPES)[number];
 export type OfficerPosition = (typeof OFFICERPOSITIONS)[number];
 export type TechnicalPosition = (typeof TECHNICALPOSITIONS)[number];
-

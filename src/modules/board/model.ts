@@ -13,7 +13,7 @@ import {
 export interface BoardDocument extends Document {
   name: string;
   bio: string;
-  image_url: string;
+  avatar?: { url: string; public_id: string };
   linkedin_url: string;
   position: BoardPosition;
   memberType: MemberType;
@@ -26,7 +26,10 @@ const boardSchema = new Schema<BoardDocument>(
   {
     name: { type: String, required: true },
     bio: { type: String, required: false },
-    image_url: { type: String, required: false },
+    avatar: {
+      url: { type: String, required: false, default: "" },
+      public_id: { type: String, required: false, default: "" },
+    },
     linkedin_url: { type: String, required: false },
     position: {
       type: String,

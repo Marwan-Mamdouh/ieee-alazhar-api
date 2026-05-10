@@ -1,17 +1,16 @@
-import dotenv from "dotenv";
 import compression from "compression";
 import express, { json, type Response } from "express";
 import helmet from "helmet";
 import { toNodeHandler } from "better-auth/node";
 
+import env from "./config/env.js";
 import connectDb from "./config/db.js";
 import boardRouter from "./modules/board/board.router.js";
 import corsMiddleware from "./middlewares/corsMiddleware.js";
 import logger from "./middlewares/logger.js";
-import { errorHandler } from "./middlewares/error.js";
 import getAuth from "./util/auth.js";
+import { errorHandler } from "./middlewares/errorHandler.js";
 
-dotenv.config();
 const app = express();
 
 const { mongoClient } = await connectDb();
@@ -25,7 +24,7 @@ app.use(json({ type: "application/json" }));
 app.use(corsMiddleware);
 app.use(express.json());
 
-app.use("/api/board", boardRouter);
+app.use("/api/v1/board", boardRouter);
 
 app.get("/", (_, res: Response) => {
 	res.json({ status: "ok", message: "API is running ✅" });
@@ -37,8 +36,8 @@ app.use((_, res: Response) => {
 app.use(errorHandler);
 
 const bootstrap = async () => {
-	if (process.env.NODE_ENV !== "production") {
-		const PORT = process.env.PORT ?? 8080;
+	if (env.NODE_ENV !== "production") {
+		const PORT = env.PORT ?? 8080;
 		app.listen(+PORT, () => console.log(`✅ Server running on port ${PORT}`));
 	}
 };
