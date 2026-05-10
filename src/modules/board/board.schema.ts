@@ -6,16 +6,23 @@ import {
   TECHNICALPOSITIONS,
 } from "./board.types.js";
 
+const validateMembersRoles = <T extends readonly string[]>(roles: T) => {
+  return z
+    .string()
+    .transform((val) => val.toLowerCase())
+    .pipe(z.enum(roles));
+};
+
 const boardMemberSchema = z.discriminatedUnion("memberType", [
   // Branch 1: If memberType is "officer"
   z.object({
     memberType: z.literal("officer"),
-    position: z.enum(OFFICERPOSITIONS),
+    position: validateMembersRoles(OFFICERPOSITIONS),
   }),
   // Branch 2: If memberType is anything else
   z.object({
     memberType: z.enum(["technical", "branding", "operation"]),
-    position: z.enum(TECHNICALPOSITIONS),
+    position: validateMembersRoles(TECHNICALPOSITIONS),
   }),
 ]);
 
@@ -23,8 +30,7 @@ export const addBoardMemberSchema = z
   .object({
     name: z.string(),
     bio: z.string().optional(),
-    image_url: z.string().optional(),
-    linkedin_url: z.string().optional(),
+    linkedin_url: z.url().optional(),
     boardYear: z
       .string()
       .optional()
@@ -32,7 +38,6 @@ export const addBoardMemberSchema = z
       .pipe(z.number().int().min(2017, "page must be >= 2017"))
       .default(new Date().getFullYear()),
     createdAt: z.date().optional(),
-    updatedAt: z.date().optional(),
   })
   .and(boardMemberSchema);
 
@@ -54,5 +59,34 @@ export const getBoardSchema = z.object({
     .pipe(z.array(z.enum(BOARD_TYPES))),
 });
 
+export const boardIdSchema = z.object({
+  boardId: z.string(),
+});
+
+export const updateBoardMemberSchema = z.object({
+  name: z.string().optional(),
+  bio: z.string().optional(),
+  linkedin_url: z.url().optional(),
+  boardYear: z
+    .string()
+    .optional()
+    .transform(Number)
+    .pipe(z.number().int().min(2017, "page must be >= 2017"))
+    .default(new Date().getFullYear()),
+  position: z
+    .string()
+    .transform((val) => val.split(","))
+    .pipe(z.array(z.enum(BOARD_POSITIONS)))
+    .optional(),
+  memberType: z
+    .string()
+    .transform((val) => val.split(","))
+    .pipe(z.array(z.enum(BOARD_TYPES)))
+    .optional(),
+  updatedAt: z.date().optional(),
+});
+
 export type AddBoardMember = z.infer<typeof addBoardMemberSchema>;
 export type GetBoard = z.infer<typeof getBoardSchema>;
+export type BoardId = z.infer<typeof boardIdSchema>;
+export type UpdateBoardMember = z.infer<typeof updateBoardMemberSchema>;
