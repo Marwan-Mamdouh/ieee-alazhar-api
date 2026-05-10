@@ -1,19 +1,14 @@
-import type { TypedRequest } from "../types/TypedRequest.js";
 import type { NextFunction, Response } from "express";
 import type { z } from "zod";
 
+import type { TypedRequest } from "../types/TypedRequest.js";
+
 export const validate =
-  <T>(schema: z.ZodType<T>) =>
-  (req: TypedRequest<T>, res: Response, next: NextFunction) => {
-    let result = schema.safeParse(req.body);
+  <T>(schema: z.ZodType<T>, key: "body" | "query" | "params" = "body") =>
+  (req: TypedRequest<T>, _: Response, next: NextFunction) => {
+    let result = schema.safeParse(req[key]);
 
-    if (!result.success) {
-      result = schema.safeParse(req.query);
-    }
-
-    if (!result.success) {
-      return res.status(400).json({ errors: result.error });
-    }
+    if (!result.success) return next(result.error);
 
     req.validatedData = result.data;
     next();
