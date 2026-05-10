@@ -1,9 +1,10 @@
 import mongoose from "mongoose";
+import env from "./env.js";
 
 const connectDB = async () => {
 	const res = await mongoose
-		.connect(process.env.MONGO_URI ?? "", {
-			dbName: process.env.MONGO_DB_NAME ?? "IEEE",
+		.connect(env.MONGO_URI ?? "", {
+			dbName: env.MONGO_DB_NAME ?? "IEEE",
 			bufferCommands: false,
 			maxPoolSize: 10,
 			serverSelectionTimeoutMS: 5000,
