@@ -6,10 +6,7 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js",
-    "vercel:dev": "vercel dev",
-    "deploy:preview": "vercel",
-    "deploy:prod": "vercel --prod"
+    "start": "node dist/server.js"
   },
   "dependencies": {
     "better-auth": "^1.6.9",
