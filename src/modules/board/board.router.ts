@@ -9,6 +9,7 @@ import {
 import type { TypedRequest } from "../../types/TypedRequest.js";
 import asyncHandler from "../../util/async.handler.js";
 import boardService from "./board.service.js";
+import { isAuthenticated } from "../../middlewares/isAuthenticated.js";
 
 const router = Router();
 router.get(
@@ -26,6 +27,7 @@ router.get(
 
 router.post(
   "/",
+  isAuthenticated,
   validate(addBoardMemberSchema),
   asyncHandler(async (req: TypedRequest<AddBoardMember>, res: Response) => {
     res.json(await boardService.addMember(req.validatedData!));
