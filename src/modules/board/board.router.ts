@@ -1,4 +1,4 @@
-import { Router, type Response, type Request } from "express";
+import { Router, type Response } from "express";
 import { validate } from "../../middlewares/validate.js";
 import {
   addBoardMemberSchema,
