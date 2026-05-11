@@ -1,6 +1,6 @@
+import helmet from "helmet";
 import compression from "compression";
 import express, { json, type Response } from "express";
-import helmet from "helmet";
 import { toNodeHandler } from "better-auth/node";
 
 import env from "./config/env.js";
@@ -17,13 +17,12 @@ const { mongoClient } = await connectDb();
 const auth = getAuth(mongoClient);
 
 app.use(logger);
-app.all("/api/auth/{*any}", toNodeHandler(auth));
-app.use(compression());
 app.use(helmet());
-app.use(json({ type: "application/json" }));
+app.use(compression());
 app.use(corsMiddleware);
-app.use(express.json());
 
+app.all("/api/auth/{*any}", toNodeHandler(auth));
+app.use(json({ type: "application/json" }));
 app.use("/api/v1/board", boardRouter);
 
 app.get("/", (_, res: Response) => {
