@@ -27,7 +27,7 @@ const lastChairman = {
 };
 
 
-module.exports = {
+export default {
     officers,
     technical,
     branding,

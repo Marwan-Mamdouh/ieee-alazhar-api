@@ -1,5 +1,3 @@
-const db = require('./db');
-
 const getBoardData = async () => {
     const queryText = `
         SELECT id, name, position, image_url AS image, bio, linkedin_url AS linkedin, board_type
@@ -9,7 +7,7 @@ const getBoardData = async () => {
     `;
 
     try {
-        const { rows } = await db.query(queryText);
+        const { rows } = await query(queryText);
         
         const structuredData = {
             officers: rows.filter(member => member.board_type === 'officers'),
@@ -38,7 +36,7 @@ const getLastChairman = async () => {
     `;
 
     try {
-        const { rows } = await db.query(queryText);
+        const { rows } = await query(queryText);
         return rows; 
     } catch (err) {
         console.error("Database query error in getLastChairman:", err);
@@ -46,7 +44,7 @@ const getLastChairman = async () => {
     }
 };
 
-module.exports = {
+export default {
     getBoardData,
     getLastChairman,
 };
