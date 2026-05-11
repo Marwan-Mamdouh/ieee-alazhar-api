@@ -1,4 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
+import env from "../config/env.js";
 
 // --- tiny color utility (no heavy deps like chalk)
 const colors = {
@@ -55,7 +56,7 @@ const logger = (req: Request, res: Response, next: NextFunction) => {
     const level = getLevel(res.statusCode);
 
     // dev-friendly colored output
-    if (process.env.NODE_ENV === "production") {
+    if (env.NODE_ENV === "production") {
       // production → structured logs
       console.log(JSON.stringify({ level, ...log }));
     } else {
