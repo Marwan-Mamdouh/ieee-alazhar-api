@@ -2,7 +2,6 @@ import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { emailOTP, openAPI } from "better-auth/plugins";
 import type { mongo } from "mongoose";
-
 import env from "../config/env.js";
 import mailService from "../modules/mail/mail.service.js";
 
