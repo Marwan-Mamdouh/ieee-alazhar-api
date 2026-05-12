@@ -17,6 +17,8 @@ const envSchema = z.object({
     .enum(["production", "development", "test"])
     .optional()
     .default("development"),
+  MAIL_USER: z.string().optional(),
+  MAIL_APP_PASSWORD: z.string().optional(),
 });
 
 const env = envSchema.safeParse(process.env);
