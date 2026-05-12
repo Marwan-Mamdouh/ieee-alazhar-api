@@ -2,8 +2,8 @@ import { z } from "zod";
 import {
   BOARD_POSITIONS,
   BOARD_TYPES,
-  OFFICERPOSITIONS,
-  TECHNICALPOSITIONS,
+  OFFICER_POSITIONS,
+  TECHNICAL_POSITIONS,
 } from "./board.types.js";
 
 const validateMembersRoles = <T extends readonly string[]>(roles: T) => {
@@ -17,12 +17,12 @@ const boardMemberSchema = z.discriminatedUnion("memberType", [
   // Branch 1: If memberType is "officer"
   z.object({
     memberType: z.literal("officer"),
-    position: validateMembersRoles(OFFICERPOSITIONS),
+    position: validateMembersRoles(OFFICER_POSITIONS),
   }),
   // Branch 2: If memberType is anything else
   z.object({
     memberType: z.enum(["technical", "branding", "operation"]),
-    position: validateMembersRoles(TECHNICALPOSITIONS),
+    position: validateMembersRoles(TECHNICAL_POSITIONS),
   }),
 ]);
 

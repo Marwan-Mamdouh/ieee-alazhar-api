@@ -1,14 +1,13 @@
-export const OFFICERPOSITIONS = [
+export const OFFICER_POSITIONS = [
   "chair",
   "treasurer",
   "secretary",
-  "vice",
+  "vice technical",
+  "vice branding",
 ] as const;
-export const TECHNICALPOSITIONS = ["head", "vice"] as const;
+export const TECHNICAL_POSITIONS = ["head", "vice"] as const;
 
-export const BOARD_POSITIONS = [
-  ...new Set([...OFFICERPOSITIONS, ...TECHNICALPOSITIONS]),
-] as const;
+export const BOARD_POSITIONS = [ ...OFFICER_POSITIONS, ...TECHNICAL_POSITIONS ] as const;
 
 export const BOARD_TYPES = [
   "officer",
@@ -22,5 +21,5 @@ export const boardMembersProps =
 
 export type BoardPosition = (typeof BOARD_POSITIONS)[number];
 export type MemberType = (typeof BOARD_TYPES)[number];
-export type OfficerPosition = (typeof OFFICERPOSITIONS)[number];
-export type TechnicalPosition = (typeof TECHNICALPOSITIONS)[number];
+export type OfficerPosition = (typeof OFFICER_POSITIONS)[number];
+export type TechnicalPosition = (typeof TECHNICAL_POSITIONS)[number];

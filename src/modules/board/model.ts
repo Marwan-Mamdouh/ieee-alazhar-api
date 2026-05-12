@@ -2,8 +2,8 @@ import { Document, model, Schema } from "mongoose";
 import {
   BOARD_POSITIONS,
   BOARD_TYPES,
-  OFFICERPOSITIONS,
-  TECHNICALPOSITIONS,
+  OFFICER_POSITIONS,
+  TECHNICAL_POSITIONS,
   type BoardPosition,
   type MemberType,
   type OfficerPosition,
@@ -42,11 +42,11 @@ const boardSchema = new Schema<BoardDocument>(
         ) {
           // 'this' refers to the document being saved
           if (this.memberType === "officer") {
-            return (OFFICERPOSITIONS as ReadonlyArray<string>).includes(
+            return (OFFICER_POSITIONS as ReadonlyArray<string>).includes(
               position,
             );
           } else {
-            return (TECHNICALPOSITIONS as ReadonlyArray<string>).includes(
+            return (TECHNICAL_POSITIONS as ReadonlyArray<string>).includes(
               position,
             );
           }
