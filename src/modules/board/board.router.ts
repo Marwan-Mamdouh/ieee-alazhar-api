@@ -4,9 +4,11 @@ import {
   addBoardMemberSchema,
   boardIdSchema,
   getBoardSchema,
+  updateBoardMemberSchema,
   type AddBoardMember,
   type GetBoard,
   type BoardId,
+  type UpdateBoardMember,
 } from "./board.schema.js";
 import type { TypedRequest } from "../../types/TypedRequest.js";
 import asyncHandler from "../../util/async.handler.js";
@@ -52,7 +54,7 @@ router.patch(
   asyncHandler(async (req: TypedRequest<BoardId>, res: Response) => {
     const result = await boardService.updateBoard(
       req.validatedData!.boardId,
-      req.body,
+      updateBoardMemberSchema.parse(req.body),
     );
     return res.json({ data: result });
   }),
