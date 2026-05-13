@@ -20,10 +20,10 @@ const auth = getAuth(mongoClient);
 
 app.use(logger);
 // Generate once at startup and cache it — don't regenerate on every request
-const openApiDoc = generateOpenAPIDocument();
+const openApiDoc = await generateOpenAPIDocument();
 
 // Serve the raw JSON spec (Scalar needs a URL to fetch from)
-app.get("/openapi.json", (req, res) => {
+app.get("/openapi.json", (_, res) => {
 	res.json(openApiDoc);
 });
 
@@ -31,8 +31,7 @@ app.get("/openapi.json", (req, res) => {
 app.use(
 	"/api/docs",
 	apiReference({
-		url: "/openapi.json",
-		theme: "moon",
+		content: openApiDoc,
 		// theme: 'purple', // optional: 'alternate' | 'default' | 'moon' | 'purple' | 'solarized'
 	}),
 );
@@ -41,7 +40,14 @@ app.use(helmet());
 app.use(compression());
 app.use(corsMiddleware);
 
-app.all("/api/auth/{*any}", toNodeHandler(auth));
+app.all(
+	"/api/auth/{*any}",
+	(_, __, next) => {
+		console.log("Auth endpoint called");
+		next();
+	},
+	toNodeHandler(auth),
+);
 app.use(json({ type: "application/json" }));
 
 app.use("/api/v1/board", boardRouter);

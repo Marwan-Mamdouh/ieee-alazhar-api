@@ -13,7 +13,7 @@ const getAuth = (client?: mongo.MongoClient) => {
 				window: 60 * 5,
 				max: 10,
 			},
-			plugins: [openAPI()],
+			plugins: [openAPI({ disableDefaultReference: true })],
 		});
 	}
 	return auth;
