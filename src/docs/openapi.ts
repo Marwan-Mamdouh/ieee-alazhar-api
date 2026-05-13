@@ -1,16 +1,47 @@
 // src/docs/openapi.ts
 import { OpenApiGeneratorV3 } from "@asteasolutions/zod-to-openapi";
+
 import { registry } from "../util/registry.js";
-
-// Import each docs file — the side effects (registerPath calls) run on import
 import "../modules/board/board.docs.js";
+import getAuth from "../util/auth.js";
 
-export function generateOpenAPIDocument() {
+export const generateOpenAPIDocument = async () => {
 	const generator = new OpenApiGeneratorV3(registry.definitions);
 
-	return generator.generateDocument({
+	const mySpec = generator.generateDocument({
 		openapi: "3.0.0",
 		info: { title: "IEEE Board API", version: "1.0.0" },
 		servers: [{ url: "/api" }],
 	});
-}
+
+	// Pull better-auth's generated spec
+	const auth = getAuth();
+	const authSpec = await auth.api.generateOpenAPISchema();
+
+	// Merge paths and components manually
+	return {
+		...mySpec,
+		paths: {
+			...mySpec.paths,
+			// prefix every auth path with /api/auth
+			...Object.fromEntries(
+				Object.entries(authSpec.paths ?? {}).map(([path, val]) => [
+					`/api/auth${path}`,
+					// Add "Auth" tag to every HTTP method on every path
+					Object.fromEntries(
+						Object.entries(val as object).map(([method, operation]) => [
+							method,
+							{ ...(operation as object), tags: ["Auth"] },
+						]),
+					),
+				]),
+			),
+		},
+		components: {
+			schemas: {
+				...mySpec.components?.schemas,
+				...authSpec.components?.schemas,
+			},
+		},
+	};
+};
