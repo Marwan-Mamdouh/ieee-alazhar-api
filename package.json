@@ -12,6 +12,8 @@
     "deploy:prod": "vercel --prod"
   },
   "dependencies": {
+    "@asteasolutions/zod-to-openapi": "^8.5.0",
+    "@scalar/express-api-reference": "^0.9.14",
     "better-auth": "^1.6.9",
     "cloudinary": "^2.10.0",
     "compression": "^1.8.1",
@@ -21,7 +23,7 @@
     "helmet": "^8.1.0",
     "mongoose": "^9.6.2",
     "multer": "^2.1.1",
-    "zod": "^4.4.2"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/compression": "^1.8.1",
