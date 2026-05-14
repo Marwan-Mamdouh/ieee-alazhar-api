@@ -1,5 +1,4 @@
 import {
-	toMemberDTO,
 	boardMembersProps,
 	type MemberType,
 	type BoardMember,
@@ -8,6 +7,7 @@ import Board from "./model.js";
 import type { AddBoardMember, UpdateBoardMember } from "./board.schema.js";
 import UploadService from "../upload/upload.service.js";
 import { AppError ,NotFoundError } from "../../errors/app.error.js";
+import { toMemberDTO } from "./board.dto.js";
 
 
 const boardService = {
@@ -20,7 +20,7 @@ const boardService = {
 			.select(boardMembersProps)
 			.lean<BoardMember[]>()
 			.exec();
-		return members;
+		return members.map(toMemberDTO);
 	},
 
 	getBoardById: async (boardId: string) => {
