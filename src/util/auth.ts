@@ -2,6 +2,10 @@ import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { emailOTP, openAPI } from "better-auth/plugins";
 import type { mongo } from "mongoose";
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3e8e03a (feat: enhance mail service with OTP functionalities for sign-in, email verification, and password reset)
 import env from "../config/env.js";
 import mailService from "../modules/mail/mail.service.js";
 
