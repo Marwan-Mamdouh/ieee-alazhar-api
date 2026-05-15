@@ -1,7 +1,9 @@
 import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
-import { openAPI } from "better-auth/plugins";
+import { emailOTP, openAPI } from "better-auth/plugins";
 import type { mongo } from "mongoose";
+
+import env from "../config/env.js";
 import mailService from "../modules/mail/mail.service.js";
 
 let auth: any;
@@ -9,47 +11,32 @@ const getAuth = (client?: mongo.MongoClient) => {
 	if (client) {
 		auth ??= betterAuth({
 			database: mongodbAdapter(client.db("IEEE"), { client }),
-			emailAndPassword: {
-				enabled: true,
-				sendResetPassword: async ({ user, url, token }, request) => {
-					mailService
-						.sendMail({
-							to: user.email,
-							subject: "Reset your password",
-							message: `Click the link to reset your password: ${url}`,
-						})
-						.catch(console.error);
-				},
-				onPasswordReset: async ({ user }, request) => {
-					// your logic here
-					mailService
-						.sendMail({
-							to: user.email,
-							subject: "Reset your password",
-							message: `Your password has been reset successfully.`,
-						})
-						.then(() => {
-							console.log(`Password for user ${user.email} has been reset.`);
-						})
-						.catch(console.error);
-				},
-			},
+			emailAndPassword: { enabled: true },
 			rateLimit: {
 				window: 60 * 5,
 				max: 10,
 			},
-			emailVerification: {
-				sendVerificationEmail: async ({ user, url, token }, req) => {
-					mailService
-						.sendMail({
-							to: user.email,
-							subject: "Verify your email address",
-							message: `Click the link to verify your email: ${url}`,
-						})
-						.catch(console.error);
-				},
+			advanced: {
+				disableOriginCheck: env.NODE_ENV !== "production",
 			},
-			plugins: [openAPI()],
+			plugins: [
+				openAPI(),
+				emailOTP({
+					overrideDefaultEmailVerification: true,
+					async sendVerificationOTP({ email, otp, type }) {
+						if (type === "sign-in") {
+							// Send the OTP for sign in
+							mailService.sendSignInOTP(email, otp).catch(console.error);
+						} else if (type === "email-verification") {
+							// Send the OTP for email verification
+							mailService.sendVerificationOTP(email, otp).catch(console.error);
+						} else {
+							// Send the OTP for password reset
+							mailService.sendResetPasswordOTP(email, otp).catch(console.error);
+						}
+					},
+				}),
+			],
 		});
 	}
 	return auth;

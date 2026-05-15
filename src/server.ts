@@ -40,14 +40,7 @@ app.use(helmet());
 app.use(compression());
 app.use(corsMiddleware);
 
-app.all(
-	"/api/auth/{*any}",
-	(_, __, next) => {
-		console.log("Auth endpoint called");
-		next();
-	},
-	toNodeHandler(auth),
-);
+app.all("/api/auth/{*any}", toNodeHandler(auth));
 app.use(json({ type: "application/json" }));
 
 app.use("/api/v1/board", boardRouter);
