@@ -7,11 +7,11 @@ export const OFFICER_POSITIONS = [
 	"vice technical",
 	"vice branding",
 ] as const;
-export const TECHNICAL_POSITIONS = ["head", "vice"] as const;
+export const COMMITTEE_POSITIONS = ["head", "vice"] as const;
 
 export const BOARD_POSITIONS = [
 	...OFFICER_POSITIONS,
-	...TECHNICAL_POSITIONS,
+	...COMMITTEE_POSITIONS,
 ] as const;
 
 export const BOARD_TYPES = [
@@ -21,13 +21,51 @@ export const BOARD_TYPES = [
 	"operation",
 ] as const;
 
+export const TECHNICAL_TRACKS = [
+	"front end",
+	"cyber security",
+	"python",
+	"network",
+	"embedded systems",
+	"ai",
+	"power distribution",
+	"c",
+	"problem solving",
+	"scientific research",
+	"back end",
+	"data science",
+	"java",
+	"advanced programming",
+	"ui/ux",
+] as const;
+
+export const BRANDING_TRACKS = [
+	"graphic design",
+	"video editing",
+	"social media marketing",
+	"photography",
+] as const;
+
+export const OPERATION_TRACKS = ["pr", "logistic", "hr"] as const;
+
+export const ALL_TRACKS = [
+	...TECHNICAL_TRACKS,
+	...BRANDING_TRACKS,
+	...OPERATION_TRACKS,
+] as const;
+
 export const boardMembersProps =
-	"_id name bio memberType boardYear position avatar linkedin_url" as const;
+	"_id name bio memberType boardYear position track avatar linkedin_url" as const;
 
 export type BoardPosition = (typeof BOARD_POSITIONS)[number];
 export type MemberType = (typeof BOARD_TYPES)[number];
 export type OfficerPosition = (typeof OFFICER_POSITIONS)[number];
-export type TechnicalPosition = (typeof TECHNICAL_POSITIONS)[number];
+export type CommitteePosition = (typeof COMMITTEE_POSITIONS)[number];
+
+export type TechnicalTrack = (typeof TECHNICAL_TRACKS)[number];
+export type BrandingTrack = (typeof BRANDING_TRACKS)[number];
+export type OperationTrack = (typeof OPERATION_TRACKS)[number];
+export type BoardTrack = (typeof ALL_TRACKS)[number];
 
 export interface BoardMember {
 	_id: string | ObjectId;
@@ -35,7 +73,8 @@ export interface BoardMember {
 	bio: string;
 	memberType: MemberType;
 	boardYear: number;
-	position: string;
+	position: BoardPosition;
+	track?: BoardTrack;
 	image_url: string;
 	linkedin_url: string;
 }
