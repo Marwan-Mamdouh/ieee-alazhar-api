@@ -8,7 +8,6 @@ import {
   type AddBoardMember,
   type GetBoard,
   type BoardId,
-  type UpdateBoardMember,
 } from "./board.schema.js";
 import type { TypedRequest } from "../../types/TypedRequest.js";
 import asyncHandler from "../../util/async.handler.js";
@@ -21,10 +20,7 @@ router.get(
   "/",
   validate(getBoardSchema, "query"),
   asyncHandler(async (req: TypedRequest<GetBoard>, res: Response) => {
-    const result = await boardService.getBoard(
-      req.validatedData?.memberType ?? [],
-      req.validatedData?.boardYear ?? 2026,
-    );
+    const result = await boardService.getBoard(req.validatedData!);
     return res.json({ data: result });
   }),
 );

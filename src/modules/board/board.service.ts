@@ -1,21 +1,24 @@
-import {
-	boardMembersProps,
-	type MemberType,
-	type BoardMember,
-} from "./board.types.js";
+import { boardMembersProps, type BoardMember } from "./board.types.js";
 import Board from "./model.js";
-import type { AddBoardMember, UpdateBoardMember } from "./board.schema.js";
+import type {
+	AddBoardMember,
+	GetBoard,
+	UpdateBoardMember,
+} from "./board.schema.js";
 import UploadService from "../upload/upload.service.js";
-import { AppError ,NotFoundError } from "../../errors/app.error.js";
+import { AppError, NotFoundError } from "../../errors/app.error.js";
 import { toMemberDTO } from "./board.dto.js";
 
-
 const boardService = {
-	getBoard: async (positions: MemberType[], year: number) => {
-		const members = await Board.find({
-			boardYear: year,
-			memberType: { $in: positions }, // <--- This matches any value in the array
-		})
+	getBoard: async (data: GetBoard) => {
+		const query = {
+			boardYear: data.boardYear,
+			...(data.memberType && { memberType: { $in: data.memberType } }),
+			...(data.position && { position: { $in: data.position } }),
+			...(data.track && { track: { $in: data.track } }),
+		};
+
+		const members = await Board.find(query)
 			.sort({ memberType: 1, _id: 1 })
 			.select(boardMembersProps)
 			.lean<BoardMember[]>()
