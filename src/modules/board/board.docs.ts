@@ -5,6 +5,7 @@ import {
 	boardMemberDTO,
 	boardIdSchema,
 	addBoardMemberSchema,
+	updateBoardMemberSchema,
 } from "./board.schema.js";
 
 registry.registerPath({
@@ -12,7 +13,7 @@ registry.registerPath({
 	path: "/api/v1/board",
 	tags: ["Board"],
 	summary: "Get board members by board type, position and year",
-	request: { params: getBoardSchema },
+	request: { query: getBoardSchema },
 	responses: {
 		200: {
 			description: "Successful response with board members",
@@ -126,7 +127,7 @@ registry.registerPath({
 		body: {
 			content: {
 				"application/json": {
-					schema: addBoardMemberSchema,
+					schema: updateBoardMemberSchema,
 				},
 			},
 		},
