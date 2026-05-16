@@ -6,43 +6,52 @@ import { Error as MongooseError } from "mongoose";
 import { AppError, ValidationError, ConflictError } from "./app.error.js";
 
 export function normalizeError(err: unknown): AppError {
-  // Already your own — pass through
-  if (err instanceof AppError) {
-    return err;
-  }
+	// Already your own — pass through
+	if (err instanceof AppError) {
+		return err;
+	}
 
-  // Zod validation failure
-  if (err instanceof ZodError) {
-    const message = err.issues
-      .map((issue) => `${issue.path.join(".")}: ${issue.message}`)
-      .join(", ");
-    return new ValidationError(message);
-  }
+	if (
+		err instanceof SyntaxError &&
+		"status" in err &&
+		err.status === 400 &&
+		"body" in err
+	) {
+		return new AppError(`Malformed JSON payload: ${err.message}`, 400, true);
+	}
 
-  // Mongoose validation error (model-level .validate())
-  if (err instanceof MongooseError.ValidationError) {
-    const message = Object.values(err.errors)
-      .map((e) => e.message)
-      .join(", ");
-    return new ValidationError(message);
-  }
+	// Zod validation failure
+	if (err instanceof ZodError) {
+		const message = err.issues
+			.map((issue) => `${issue.path.join(".")}: ${issue.message}`)
+			.join(", ");
+		return new ValidationError(message);
+	}
 
-  // Mongoose cast error — e.g. invalid ObjectId
-  if (err instanceof MongooseError.CastError) {
-    return new ValidationError(`Invalid value for field: ${err.path}`);
-  }
+	// Mongoose validation error (model-level .validate())
+	if (err instanceof MongooseError.ValidationError) {
+		const message = Object.values(err.errors)
+			.map((e) => e.message)
+			.join(", ");
+		return new ValidationError(message);
+	}
 
-  // MongoDB duplicate key (unique constraint)
-  if (err instanceof MongoServerError && err.code === 11000) {
-    const field = Object.keys(err.keyPattern ?? {})[0] ?? "field";
-    return new ConflictError(`${field} already exists`);
-  }
+	// Mongoose cast error — e.g. invalid ObjectId
+	if (err instanceof MongooseError.CastError) {
+		return new ValidationError(`Invalid value for field: ${err.path}`);
+	}
 
-  // Native JS errors (TypeError, ReferenceError, etc.) — these are bugs
-  if (err instanceof Error) {
-    return new AppError(err.message, 500, false); // isOperational: false = bug
-  }
+	// MongoDB duplicate key (unique constraint)
+	if (err instanceof MongoServerError && err.code === 11000) {
+		const field = Object.keys(err.keyPattern ?? {})[0] ?? "field";
+		return new ConflictError(`${field} already exists`);
+	}
 
-  // Truly unknown — string thrown, object thrown, whatever
-  return new AppError("An unexpected error occurred", 500, false);
+	// Native JS errors (TypeError, ReferenceError, etc.) — these are bugs
+	if (err instanceof Error) {
+		return new AppError(err.message, 500, false); // isOperational: false = bug
+	}
+
+	// Truly unknown — string thrown, object thrown, whatever
+	return new AppError("An unexpected error occurred", 500, false);
 }
