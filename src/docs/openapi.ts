@@ -3,7 +3,7 @@ import { OpenApiGeneratorV3 } from "@asteasolutions/zod-to-openapi";
 
 import { registry } from "../util/registry.js";
 import "../modules/board/board.docs.js";
-import getAuth from "../util/auth.js";
+import auth from "../util/auth.js";
 
 export const generateOpenAPIDocument = async () => {
 	const generator = new OpenApiGeneratorV3(registry.definitions);
@@ -14,8 +14,6 @@ export const generateOpenAPIDocument = async () => {
 		servers: [{ url: "/api" }],
 	});
 
-	// Pull better-auth's generated spec
-	const auth = getAuth();
 	const authSpec = await auth.api.generateOpenAPISchema();
 
 	// Merge paths and components manually

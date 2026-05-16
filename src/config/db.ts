@@ -1,7 +1,11 @@
-import mongoose from "mongoose";
+import mongoose, { mongo } from "mongoose";
 import env from "./env.js";
 
+let client: mongo.MongoClient | null = null;
+
 const connectDB = async () => {
+	if (client) return { mongoClient: client };
+
 	const res = await mongoose
 		.connect(env.MONGO_URI ?? "", {
 			dbName: env.MONGO_DB_NAME ?? "IEEE",
@@ -18,15 +22,14 @@ const connectDB = async () => {
 			console.error("❌ Failed to connect to MongoDB", err);
 			process.exit(1);
 		});
-
-	return { mongoClient: res.connection.getClient() };
+	client = res.connection.getClient();
+	return { mongoClient: client };
 };
 
 // Graceful shutdown
-const disconnectDB = () => {
-	mongoose.disconnect().then(() => {
-		console.log("❎ MongoDB disconnected");
-	});
+const disconnectDB = async () => {
+	await mongoose.disconnect();
+	console.log("❎ MongoDB disconnected");
 };
 
 process.on("SIGINT", disconnectDB);

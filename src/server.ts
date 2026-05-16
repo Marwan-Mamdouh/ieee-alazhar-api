@@ -9,14 +9,13 @@ import connectDb from "./config/db.js";
 import boardRouter from "./modules/board/board.router.js";
 import corsMiddleware from "./middlewares/corsMiddleware.js";
 import logger from "./middlewares/logger.js";
-import getAuth from "./util/auth.js";
+import auth from "./util/auth.js";
 import { generateOpenAPIDocument } from "./docs/openapi.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 
 const app = express();
 
-const { mongoClient } = await connectDb();
-const auth = getAuth(mongoClient);
+await connectDb();
 
 app.use(logger);
 // Generate once at startup and cache it — don't regenerate on every request
