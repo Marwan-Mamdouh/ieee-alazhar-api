@@ -47,9 +47,7 @@ registerCacheListeners();
 
 app.use("/api/v1/board", boardRouter);
 
-app.get("/", (_, res: Response) => {
-	res.json({ status: "ok", message: "API is running ✅" });
-});
+app.get("/", (_, res: Response) => res.redirect("/api/docs"));
 app.use((_, res: Response) => {
 	res.status(404).json({ message: "Endpoint not found." });
 });
