@@ -1,6 +1,8 @@
 import type { Request, Response, NextFunction } from "express";
 import { fromNodeHeaders } from "better-auth/node";
+
 import auth from "../util/auth.js";
+import { UnauthorizedError } from "../errors/app.error.js";
 
 export const isAuthenticated = async (
 	req: Request,
@@ -11,7 +13,8 @@ export const isAuthenticated = async (
 		headers: fromNodeHeaders(req.headers),
 	});
 
-	if (!session) return next(new Error("Unauthorized"));
+	if (!session)
+		return next(new ("invalid or expired session"));
 
 	req.user = session?.user;
 	next();
