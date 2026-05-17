@@ -12,6 +12,7 @@ import logger from "./middlewares/logger.js";
 import auth from "./util/auth.js";
 import { generateOpenAPIDocument } from "./docs/openapi.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
+import { registerCacheListeners } from "./infra/cache.listeners.js";
 
 const app = express();
 
@@ -41,6 +42,8 @@ app.use(corsMiddleware);
 
 app.all("/api/auth/{*any}", toNodeHandler(auth));
 app.use(json({ type: "application/json" }));
+
+registerCacheListeners();
 
 app.use("/api/v1/board", boardRouter);
 
