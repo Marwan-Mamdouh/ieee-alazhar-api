@@ -1,5 +1,8 @@
 # IEEE Al-Azhar Board API 🚀
 
+## Built to serve the IEEE Al-Azhar student branch website. Used in production by the branch to manage and display board member data. that is already done
+in the future we will save feedback for the branch and make a news paper features
+
 A robust, type-safe REST API built with **TypeScript**, **Express**, and **MongoDB** for managing the IEEE Al-Azhar Student Branch board members.
 
 ---
