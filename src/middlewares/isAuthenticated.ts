@@ -14,7 +14,7 @@ export const isAuthenticated = async (
 	});
 
 	if (!session)
-		return next(new ("invalid or expired session"));
+		return next(new UnauthorizedError("invalid or expired session"));
 
 	req.user = session?.user;
 	next();
