@@ -5,12 +5,14 @@
 	"type": "module",
 	"scripts": {
 		"dev": "tsx watch src/server.ts",
-		"build": "tsc",
+		"build": "tsc --noEmit",
 		"start": "node dist/server.js"
 	},
 	"dependencies": {
 		"@asteasolutions/zod-to-openapi": "^8.5.0",
-		"@scalar/express-api-reference": "^0.9.14",
+		"@scalar/express-api-reference": "^0.9.16",
+		"@upstash/ratelimit": "^2.0.8",
+		"@upstash/redis": "^1.38.0",
 		"better-auth": "^1.6.11",
 		"cloudinary": "^2.10.0",
 		"compression": "^1.8.1",
@@ -31,7 +33,7 @@
 		"@types/node": "^25.8.0",
 		"@types/nodemailer": "^8.0.0",
 		"ts-node": "^10.9.2",
-		"tsx": "^4.22.0",
+		"tsx": "^4.22.1",
 		"typescript": "^6.0.3"
 	}
 }
