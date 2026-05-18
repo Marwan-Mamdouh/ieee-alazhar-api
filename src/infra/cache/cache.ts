@@ -1,9 +1,9 @@
-import redis from "../config/redis.js"; // your existing redis client
+import redis from "../../config/redis.js"; // your existing redis client
 import type {
 	BoardPosition,
 	BoardTrack,
 	MemberType,
-} from "../modules/board/board.types.js";
+} from "../../modules/board/board.types.js";
 
 // ─── Key Factory ────────────────────────────────────────────────────────────
 // Central place for all cache key shapes.
@@ -68,7 +68,7 @@ export const getCachedData = async <T>(
 
 	// Step 3: Write to cache — failure here is non-fatal
 	try {
-		await redis.setex(cacheKey, ttl, JSON.stringify(data));
+		await redis.setex(cacheKey, ttl, data);
 		console.log(`[Cache] Stored "${cacheKey}" for ${ttl}s`);
 	} catch (err) {
 		console.error(`[Cache] Write error for "${cacheKey}":`, err);
