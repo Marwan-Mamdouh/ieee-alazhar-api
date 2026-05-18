@@ -1,5 +1,11 @@
 import { type Request } from "express";
 
-export interface TypedRequest<T> extends Request {
-  validatedData?: T;
+export interface TypedRequest<
+	TBody = unknown,
+	TParams = unknown,
+	TQuery = unknown,
+> extends Request {
+	validatedBody?: TBody;
+	validatedParams?: TParams;
+	validatedQuery?: TQuery;
 }
