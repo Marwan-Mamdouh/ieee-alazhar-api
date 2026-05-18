@@ -5,8 +5,9 @@
 	"type": "module",
 	"scripts": {
 		"dev": "tsx watch src/server.ts",
-		"build": "tsc --noEmit",
-		"start": "tsc && node dist/server.js"
+		"build": "tsc",
+		"typecheck": "tsc --noEmit",
+		"start": "node dist/server.js"
 	},
 	"dependencies": {
 		"@asteasolutions/zod-to-openapi": "^8.5.0",
