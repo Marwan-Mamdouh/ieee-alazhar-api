@@ -12,7 +12,7 @@ import logger from "./middlewares/logger.js";
 import auth from "./util/auth.js";
 import { generateOpenAPIDocument } from "./docs/openapi.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
-import { registerCacheListeners } from "./infra/cache.listeners.js";
+import { registerCacheListeners } from "./infra/cache/cache.listeners.js";
 
 const app = express();
 
@@ -45,9 +45,10 @@ app.use(json({ type: "application/json" }));
 
 registerCacheListeners();
 
+app.get("/", (_, res: Response) => res.redirect("/api/docs"));
+
 app.use("/api/v1/board", boardRouter);
 
-app.get("/", (_, res: Response) => res.redirect("/api/docs"));
 app.use((_, res: Response) => {
 	res.status(404).json({ message: "Endpoint not found." });
 });

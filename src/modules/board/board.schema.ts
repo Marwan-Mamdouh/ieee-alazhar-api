@@ -1,4 +1,4 @@
-import z from "../../config/zod.config.js";
+import z from "../../util/zod.config.js";
 import {
 	BOARD_POSITIONS,
 	BOARD_TYPES,
@@ -156,7 +156,7 @@ const boardYear = z
 				"Year cannot be more than 5 years in the future",
 			),
 	)
-	.default(new Date().getFullYear())
+	.default(() => new Date().getFullYear())
 	.openapi({ example: 2026 });
 
 const baseBoardMemberSchema = z.object({
