@@ -4,11 +4,11 @@ The Board module handles the management of IEEE Al-Azhar Student Branch board me
 
 ## 🏛 Architecture Overview
 
-- **`board.router.ts`**: Defines the RESTful API surface and applies validation/auth middlewares.
-- **`board.service.ts`**: Encapsulates all business logic, MongoDB queries, and coordination with the `UploadModule`.
-- **`board.schema.ts`**: Strictly enforces data integrity using **Zod**. It includes complex validation like `discriminatedUnion` to ensure the `position` matches the `memberType`.
+- **`board.router.ts`**: Defines the RESTful API surface. It uses `httpCache` for performance, `rateLimitMiddleware` for protection, and `validate` for type-safety.
+- **`board.service.ts`**: Encapsulates all business logic and MongoDB queries.
+- **`board.schema.ts`**: Strictly enforces data integrity using **Zod**. Includes support for `memberType`, `position`, and `track` validation.
 - **`model.ts`**: Mongoose model representing the `Board` collection.
-- **`board.types.ts`**: Centralized enums and types for positions and board categories.
+- **`board.types.ts`**: Centralized enums and types for positions, tracks, and board categories.
 
 ---
 
@@ -21,10 +21,12 @@ All routes are prefixed with `/api/v1/board`.
 `GET /`
 Retrieves a list of board members based on the provided filters.
 
+- **Caching:** 1-day public cache with ETag revalidation.
 - **Query Parameters:**
-  - `memberType` (Required): Comma-separated list (e.g., `officer,technical`).
-  - `boardYear` (Optional): Integer (e.g., `2025`). Defaults to the current year.
+  - `memberType` (Optional): Comma-separated list (e.g., `officer,technical`).
+  - `boardYear` (Optional): Integer (e.g., `2025`).
   - `position` (Optional): Comma-separated list of roles (e.g., `chair,head`).
+  - `track` (Optional): Comma-separated list of tracks (e.g., `web,mobile`).
 - **Logic:** Returns members sorted by their type and creation ID.
 
 ### 2. Add New Member
@@ -32,26 +34,28 @@ Retrieves a list of board members based on the provided filters.
 `POST /`
 Creates a new board member record.
 
-- **Authentication:** Required (Admin only).
+- **Authentication:** Required.
+- **Rate Limiting:** Applied to prevent abuse.
+- **Cache Invalidation:** Automatically invalidates all board list caches.
 - **Body (JSON):**
   ```json
   {
   	"name": "John Doe",
   	"memberType": "officer",
   	"position": "chair",
+  	"track": "none",
   	"bio": "Optional bio",
   	"linkedin_url": "https://linkedin.com/in/johndoe",
   	"boardYear": 2026
   }
   ```
-- **Validation:** If `memberType` is `officer`, the `position` must be one of: `chair`, `treasurer`, `secretary`, `vice`. For other types, it must be `head` or `vice`.
 
 ### 3. Get Member Details
 
 `GET /:boardId`
 
+- **Caching:** 1-day public cache.
 - **Params:** `boardId` (MongoDB ObjectId).
-- **Response:** Detailed member object including their DTO-mapped fields.
 
 ### 4. Update Member Info
 
@@ -59,39 +63,32 @@ Creates a new board member record.
 Updates the text-based fields of a member.
 
 - **Authentication:** Required.
-- **Body:** Partial `AddBoardMember` fields.
+- **Cache Invalidation:** Invalidates both the specific member cache and the list caches.
 
 ### 5. Delete Member
 
 `DELETE /:boardId`
-Removes the member from the database.
 
-- **Side Effect:** Automatically calls `UploadService.deleteImage` to remove the member's avatar from Cloudinary if it exists.
+- **Cache Invalidation:** Full cleanup of related caches.
+- **Side Effect:** Automatically removes the avatar from Cloudinary.
 
 ### 6. Upload/Update Avatar
 
 `PATCH /:boardId/avatar`
-Uploads a profile picture for the member.
 
+- **Rate Limiting:** Strict limits applied to file uploads.
 - **Form-Data:** `avatar` (File).
-- **Logic:**
-  1. If an old avatar exists, it is deleted from Cloudinary.
-  2. The new image is uploaded to the `board/avatars` folder.
-  3. The database record is updated with the new `url` and `public_id`.
-  4. Includes automatic cleanup: if the database save fails after upload, the newly uploaded image is deleted to prevent orphaned files.
-
-### 7. Remove Avatar
-
-`DELETE /:boardId/avatar`
-Removes only the profile picture while keeping the member record.
+- **Logic:** Handles old avatar deletion, new upload, and database update with atomic-like cleanup on failure.
 
 ---
 
-## 🛠 Business Logic & Security
+## ⚡ Performance & Caching
 
-### 🛡 Validation Logic
+The module uses a multi-layer caching strategy:
 
-The `board.schema.ts` uses a `discriminatedUnion`. This ensures that you cannot accidentally assign a "Technical Head" position to someone marked as an "Officer". This type-safety extends from the HTTP request all the way to the TypeScript service layer.
+1.  **L1 (HTTP Cache):** The `httpCache` middleware sets `Cache-Control` headers and generates `ETags`. If the data hasn't changed, the server responds with `304 Not Modified`, saving bandwidth.
+2.  **L2 (Redis Cache):** The service layer uses `getCachedData` to store the results of expensive MongoDB queries in Upstash Redis.
+3.  **Event-Driven Invalidation:** When a member is added, updated, or deleted, the `appEmitter` triggers events (e.g., `BOARD_UPDATED`). Listeners then clear the relevant Redis keys to ensure data consistency.
 
 ### 🔄 Data Transfer Object (DTO)
 

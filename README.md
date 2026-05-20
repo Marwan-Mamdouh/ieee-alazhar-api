@@ -1,6 +1,7 @@
 # IEEE Al-Azhar Board API 🚀
 
 ## Built to serve the IEEE Al-Azhar student branch website. Used in production by the branch to manage and display board member data. that is already done
+
 in the future we will save feedback for the branch and make a news paper features
 
 A robust, type-safe REST API built with **TypeScript**, **Express**, and **MongoDB** for managing the IEEE Al-Azhar Student Branch board members.
@@ -11,11 +12,14 @@ A robust, type-safe REST API built with **TypeScript**, **Express**, and **Mongo
 
 - **Runtime:** [Node.js](https://nodejs.org/) (v20+)
 - **Language:** [TypeScript](https://www.typescriptlang.org/) (v6.0)
-- **Framework:** [Express.js](https://expressjs.com/) (v5.1)
-- **Database:** [MongoDB](https://www.mongodb.com/) (via Mongoose)
+- **Framework:** [Express.js](https://expressjs.com/) (v5.2)
+- **Database:** [MongoDB](https://www.mongodb.com/) (via Mongoose 9.0)
+- **Caching & Rate Limiting:** [Upstash Redis](https://upstash.com/)
 - **Authentication:** [Better-Auth](https://better-auth.com/)
 - **Validation:** [Zod](https://zod.dev/)
 - **File Storage:** [Cloudinary](https://cloudinary.com/)
+- **Email Service:** [Nodemailer](https://nodemailer.com/)
+- **API Reference:** [Scalar](https://scalar.com/)
 - **Deployment:** [Vercel](https://vercel.com/)
 
 ---
@@ -27,6 +31,7 @@ A robust, type-safe REST API built with **TypeScript**, **Express**, and **Mongo
 - **Node.js:** v20 or higher.
 - **PNPM/NPM:** `npm` is used by default.
 - **MongoDB:** A running instance (local or Atlas).
+- **Upstash Redis:** Account for caching and rate limiting.
 - **Cloudinary Account:** For image uploads.
 
 ### 2. Installation
@@ -49,6 +54,10 @@ NODE_ENV=development
 # Database
 DATABASE_URL=mongodb://localhost:27017/ieee-board
 
+# Redis (Upstash)
+UPSTASH_REDIS_REST_URL=your_url
+UPSTASH_REDIS_REST_TOKEN=your_token
+
 # Cloudinary
 CLOUDINARY_CLOUD_NAME=your_name
 CLOUDINARY_API_KEY=your_key
@@ -57,16 +66,22 @@ CLOUDINARY_API_SECRET=your_secret
 # Authentication (Better-Auth)
 BETTER_AUTH_SECRET=your_secret
 BETTER_AUTH_URL=http://localhost:8080
+
+# Mailer
+MAIL_HOST=your_host
+MAIL_PORT=your_port
+MAIL_USER=your_user
+MAIL_PASS=your_pass
 ```
 
 ### 4. Running the Project
 
-| Command              | Description                                              |
-| :------------------- | :------------------------------------------------------- |
-| `npm run dev`        | Starts the development server with hot-reload (tsx).     |
-| `npm run build`      | Compiles TypeScript to JavaScript in the `dist/` folder. |
-| `npm start`          | Runs the compiled application from `dist/`.              |
-| `npm run vercel:dev` | Runs the Vercel local environment.                       |
+| Command             | Description                                              |
+| :------------------ | :------------------------------------------------------- |
+| `npm run dev`       | Starts the development server with hot-reload (tsx).     |
+| `npm run build`     | Compiles TypeScript to JavaScript in the `dist/` folder. |
+| `npm run typecheck` | Runs the TypeScript compiler in no-emit mode.            |
+| `npm start`         | Runs the compiled application from `dist/`.              |
 
 ---
 
@@ -76,15 +91,28 @@ The project follows a **modular architecture**, ensuring high maintainability an
 
 ```text
 src/
-├── config/             # Configuration files (DB, Cloudinary, Env validation)
+├── config/             # Configuration files (DB, Cloudinary, Env, Mailer)
+├── docs/               # OpenAPI/Scalar documentation definitions
 ├── errors/             # Custom error classes & normalization
-├── middlewares/        # Express middlewares (Auth, Logger, Validation)
+├── infra/              # Infrastructure (Redis Cache, Rate Limiting)
+├── middlewares/        # Express middlewares (Auth, Logger, Caching, Validation)
 ├── modules/            # Domain-driven modules
 │   ├── board/          # Board members management
+│   ├── mail/           # Email service (OTP, notifications)
 │   └── upload/         # Image upload service
 ├── types/              # Global TypeScript types
-└── util/               # Shared utility functions (Async handlers, Auth helpers)
+└── util/               # Shared utility functions (Async handlers, ETag, Registry)
 ```
+
+---
+
+## ✨ Key Features
+
+- **⚡ Performance:** Redis-backed read-through caching for API responses and HTTP ETag revalidation.
+- **🛡 Security:** Sliding-window rate limiting (via Upstash), secure headers (Helmet), and strict Zod validation.
+- **📧 Communication:** Integrated email service for OTP-based authentication and notifications.
+- **📖 Documentation:** Automatically generated OpenAPI 3.0 specs served via interactive Scalar reference.
+- **🏗 Robustness:** Centralized event-driven cache invalidation and comprehensive error normalization.
 
 ---
 
