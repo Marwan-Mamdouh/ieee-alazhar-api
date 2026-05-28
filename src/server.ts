@@ -7,6 +7,7 @@ import { apiReference } from "@scalar/express-api-reference";
 import env from "./config/env.js";
 import connectDb from "./config/db.js";
 import boardRouter from "./modules/board/board.router.js";
+import feedbackRouter from "./modules/feedback/feedback.router.js";
 import corsMiddleware from "./middlewares/corsMiddleware.js";
 import logger from "./middlewares/logger.js";
 import auth from "./util/auth.js";
@@ -48,6 +49,7 @@ registerCacheListeners();
 app.get("/", (_, res: Response) => res.redirect("/api/docs"));
 
 app.use("/api/v1/board", boardRouter);
+app.use("/api/v1/feedback", feedbackRouter);
 
 app.use((_, res: Response) => {
 	res.status(404).json({ message: "Endpoint not found." });

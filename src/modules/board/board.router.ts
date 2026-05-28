@@ -45,19 +45,17 @@ router.get(
 	"/:boardId",
 	httpCache({ strategy: "public", maxAge: 60 * 60 * 60 * 24 }), // 1 day
 	validate(boardIdSchema, "params"),
-	asyncHandler(
-		async (req: TypedRequest<unknown, BoardId, unknown>, res: Response) => {
-			const { boardId } = req.validatedParams!;
-			const cacheKey = CACHE_KEYS.boardById(boardId);
+	asyncHandler(async (req: TypedRequest<unknown, BoardId>, res: Response) => {
+		const { boardId } = req.validatedParams!;
+		const cacheKey = CACHE_KEYS.boardById(boardId);
 
-			const result = await getCachedData(
-				cacheKey,
-				() => boardService.getBoardById(boardId),
-				TTL.BOARD_BY_ID,
-			);
-			return res.json({ data: result });
-		},
-	),
+		const result = await getCachedData(
+			cacheKey,
+			() => boardService.getBoardById(boardId),
+			TTL.BOARD_BY_ID,
+		);
+		return res.json({ data: result });
+	}),
 );
 
 router.post(
@@ -65,20 +63,15 @@ router.post(
 	isAuthenticated,
 	rateLimitMiddleware,
 	validate(addBoardMemberSchema),
-	asyncHandler(
-		async (
-			req: TypedRequest<AddBoardMember, unknown, unknown>,
-			res: Response,
-		) => {
-			const result = await boardService.addMember(req.validatedBody!);
+	asyncHandler(async (req: TypedRequest<AddBoardMember>, res: Response) => {
+		const result = await boardService.addMember(req.validatedBody!);
 
-			appEmitter.emitEvent(CACHE_EVENTS.BOARD_MEMBER_ADDED, {
-				boardId: result.id, // adjust to match your actual return shape
-			});
+		appEmitter.emitEvent(CACHE_EVENTS.BOARD_MEMBER_ADDED, {
+			boardId: result.id, // adjust to match your actual return shape
+		});
 
-			return res.status(201).json({ data: result });
-		},
-	),
+		return res.status(201).json({ data: result });
+	}),
 );
 
 router.patch(
@@ -88,13 +81,12 @@ router.patch(
 	validate(updateBoardMemberSchema, "body"),
 	asyncHandler(
 		async (req: TypedRequest<UpdateBoardMember, BoardId>, res: Response) => {
+			const { boardId } = req.validatedParams!;
 			const result = await boardService.updateBoard(
-				req.validatedParams!.boardId,
+				boardId,
 				req.validatedBody!,
 			);
-			appEmitter.emitEvent(CACHE_EVENTS.BOARD_UPDATED, {
-				boardId: req.validatedParams!.boardId,
-			});
+			appEmitter.emitEvent(CACHE_EVENTS.BOARD_UPDATED, { boardId });
 			return res.json({ data: result });
 		},
 	),
@@ -104,14 +96,12 @@ router.delete(
 	"/:boardId",
 	isAuthenticated,
 	validate(boardIdSchema, "params"),
-	asyncHandler(
-		async (req: TypedRequest<unknown, BoardId, unknown>, res: Response) => {
-			const { boardId } = req.validatedParams!;
-			const result = await boardService.deleteBoard(boardId);
-			appEmitter.emitEvent(CACHE_EVENTS.BOARD_DELETED, { boardId });
-			return res.status(204).json({ data: result });
-		},
-	),
+	asyncHandler(async (req: TypedRequest<unknown, BoardId>, res: Response) => {
+		const { boardId } = req.validatedParams!;
+		const result = await boardService.deleteBoard(boardId);
+		appEmitter.emitEvent(CACHE_EVENTS.BOARD_DELETED, { boardId });
+		return res.status(204).json({ data: result });
+	}),
 );
 
 router.patch(
@@ -120,31 +110,27 @@ router.patch(
 	isAuthenticated,
 	upload.single("avatar"),
 	validate(boardIdSchema, "params"),
-	asyncHandler(
-		async (req: TypedRequest<unknown, BoardId, unknown>, res: Response) => {
-			const { boardId } = req.validatedParams!;
-			const savedAvatar = await boardService.updateBoardAvatar(
-				boardId,
-				req.file!,
-			);
-			appEmitter.emitEvent(CACHE_EVENTS.BOARD_AVATAR_UPDATED, { boardId });
-			return res.json({ data: savedAvatar });
-		},
-	),
+	asyncHandler(async (req: TypedRequest<unknown, BoardId>, res: Response) => {
+		const { boardId } = req.validatedParams!;
+		const savedAvatar = await boardService.updateBoardAvatar(
+			boardId,
+			req.file!,
+		);
+		appEmitter.emitEvent(CACHE_EVENTS.BOARD_AVATAR_UPDATED, { boardId });
+		return res.json({ data: savedAvatar });
+	}),
 );
 
 router.delete(
 	"/:boardId/avatar",
 	isAuthenticated,
 	validate(boardIdSchema, "params"),
-	asyncHandler(
-		async (req: TypedRequest<unknown, BoardId, unknown>, res: Response) => {
-			const { boardId } = req.validatedParams!;
-			const result = await boardService.deleteBoardAvatar(boardId);
-			appEmitter.emitEvent(CACHE_EVENTS.BOARD_AVATAR_DELETED, { boardId });
-			return res.status(204).json({ data: result });
-		},
-	),
+	asyncHandler(async (req: TypedRequest<unknown, BoardId>, res: Response) => {
+		const { boardId } = req.validatedParams!;
+		const result = await boardService.deleteBoardAvatar(boardId);
+		appEmitter.emitEvent(CACHE_EVENTS.BOARD_AVATAR_DELETED, { boardId });
+		return res.status(204).json({ data: result });
+	}),
 );
 
 export default router;

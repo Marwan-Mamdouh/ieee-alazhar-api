@@ -1,5 +1,9 @@
-import { boardMembersProps, type BoardMember } from "./board.types.js";
-import Board from "./model.js";
+import {
+	boardMembersProps,
+	type BoardMember,
+	type MemberType,
+} from "./board.types.js";
+import Board from "./board.model.js";
 import type {
 	AddBoardMember,
 	GetBoard,
@@ -12,18 +16,47 @@ import { toMemberDTO } from "./board.dto.js";
 const boardService = {
 	getBoard: async (data: GetBoard) => {
 		const query = {
-			boardYear: data.boardYear,
+			boardYear: { $gte: data.yearFrom, $lte: data.yearTo },
 			...(data.memberType && { memberType: { $in: data.memberType } }),
 			...(data.position && { position: { $in: data.position } }),
 			...(data.track && { track: { $in: data.track } }),
 		};
 
-		const members = await Board.find(query)
-			.sort({ memberType: 1, _id: 1 })
-			.select(boardMembersProps)
-			.lean<BoardMember[]>()
+		const groupedMembers = await Board.aggregate([])
+			.match(query) // Stage 1: Filter documents based on the query
+			.sort({ memberType: 1, _id: 1 }) // Stage 2: Sort documents *before* grouping
+			.group({
+				// Stage 3: Group by memberType and push the desired fields into a members array
+				_id: "$memberType", // Grouping key
+				members: {
+					$push: {
+						_id: "$_id",
+						name: "$name",
+						bio: "$bio",
+						avatar: "$avatar",
+						linkedin_url: "$linkedin_url",
+						position: "$position",
+						memberType: "$memberType",
+						track: "$track",
+						boardYear: "$boardYear",
+					},
+				},
+			})
 			.exec();
-		return members.map(toMemberDTO);
+
+		// Shape the final object dynamically in TypeScript
+		const initialOutput: Record<MemberType, BoardMember[]> = {
+			officer: [],
+			technical: [],
+			branding: [],
+			operation: [],
+		};
+
+		return groupedMembers.reduce((acc, currentGroup) => {
+			// Format each member using your DTO function
+			acc[currentGroup._id] = currentGroup.members.map(toMemberDTO);
+			return acc;
+		}, initialOutput);
 	},
 
 	getBoardById: async (boardId: string) => {
@@ -42,14 +75,20 @@ const boardService = {
 
 	updateBoard: async (boardId: string, boardData: UpdateBoardMember) => {
 		const board = await Board.findByIdAndUpdate(boardId, boardData, {
-			new: true,
-		});
+			returnDocument: "after",
+		})
+			.select(boardMembersProps)
+			.lean<BoardMember>()
+			.exec();
 		if (!board) throw new NotFoundError("Board not found");
 		return toMemberDTO(board);
 	},
 
 	deleteBoard: async (boardId: string) => {
-		const board = await Board.findByIdAndDelete(boardId);
+		const board = await Board.findByIdAndDelete(boardId)
+			.select(boardMembersProps)
+			.lean<BoardMember>()
+			.exec();
 		if (!board) throw new NotFoundError("Board not found");
 		if (board?.avatar?.public_id) {
 			UploadService.deleteImage(board.avatar.public_id).catch((err) => {
@@ -60,7 +99,9 @@ const boardService = {
 	},
 
 	updateBoardAvatar: async (boardId: string, file: Express.Multer.File) => {
-		const board = await Board.findById(boardId);
+		const board = await Board.findById(boardId)
+			.select(boardMembersProps)
+			.exec();
 		if (!board) throw new NotFoundError("Board not found");
 
 		if (board?.avatar?.public_id) {
@@ -90,7 +131,9 @@ const boardService = {
 	},
 
 	deleteBoardAvatar: async (boardId: string) => {
-		const board = await Board.findById(boardId);
+		const board = await Board.findById(boardId)
+			.select(boardMembersProps)
+			.exec();
 		if (!board) throw new NotFoundError("Board not found");
 
 		if (board?.avatar?.public_id) {

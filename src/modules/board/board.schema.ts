@@ -1,4 +1,6 @@
-import z from "../../util/zod.config.js";
+import type { RefinementCtx } from "zod";
+
+import z, { idSchema } from "../../util/zod.config.js";
 import {
 	BOARD_POSITIONS,
 	BOARD_TYPES,
@@ -34,7 +36,7 @@ type CrossFieldUpdatePayload = {
  */
 const verifyStructuralAlignment = (
 	data: CrossFieldUpdatePayload,
-	ctx: z.RefinementCtx,
+	ctx: RefinementCtx,
 ) => {
 	const { memberType, position, track } = data;
 	// Rule 1: No structural fields being modified? Exit early.
@@ -173,28 +175,60 @@ export const addBoardMemberSchema = baseBoardMemberSchema
 	.and(boardMemberRoleSchema)
 	.openapi("addBoardMemberSchema");
 
+const CURRENT_YEAR = new Date().getFullYear();
+const MIN_YEAR = 2017;
+const MAX_YEAR = CURRENT_YEAR + 5;
+
+const yearField = (example: number) =>
+	z
+		.string()
+		.min(2)
+		.max(4)
+		.transform(Number)
+		.pipe(
+			z
+				.number()
+				.int()
+				.min(MIN_YEAR, `Year must be >= ${MIN_YEAR}`)
+				.max(MAX_YEAR, `Year cannot be more than 5 years in the future`),
+		)
+		.openapi({ example });
+
 export const getBoardSchema = z
 	.object({
-		boardYear,
+		yearFrom: yearField(2024).optional(),
+		yearTo: yearField(2026).optional(),
 		position: parseQueryArray(BOARD_POSITIONS).openapi({
 			example: ["chair", "head"],
 		}),
 		memberType: parseQueryArray(BOARD_TYPES).openapi({
 			example: ["officer", "technical"],
 		}),
-		track: parseQueryArray(ALL_TRACKS).openapi({ example: ["back end", "hr"] }),
+		track: parseQueryArray(ALL_TRACKS).openapi({
+			example: ["back end", "hr"],
+		}),
+	})
+	.transform((data) => ({
+		...data,
+		yearFrom: data.yearFrom ?? CURRENT_YEAR,
+		yearTo: data.yearTo ?? CURRENT_YEAR,
+	}))
+	.superRefine((data, ctx) => {
+		if (data.yearFrom > data.yearTo) {
+			ctx.addIssue({
+				code: "custom",
+				message: `yearFrom (${data.yearFrom}) cannot be greater than yearTo (${data.yearTo})`,
+				path: ["yearFrom"],
+			});
+		}
 	})
 	.openapi("getBoardSchema");
 
-export const boardIdSchema = z
-	.object({
-		boardId: z
-			.string()
-			.min(2)
-			.max(100)
-			.openapi({ example: "64a7b9c8e1f2a3b4c5d6e7f" }),
-	})
-	.openapi("boardIdSchema");
+export const boardIdSchema = z.object({
+	boardId: idSchema("64a7b9c8e1f2a3b4c5d6e7f").openapi({
+		description: "MongoDB ObjectId of the board member",
+	}),
+});
 
 /**
  * PATCH Update Schema
