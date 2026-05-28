@@ -75,14 +75,20 @@ const boardService = {
 
 	updateBoard: async (boardId: string, boardData: UpdateBoardMember) => {
 		const board = await Board.findByIdAndUpdate(boardId, boardData, {
-			new: true,
-		});
+			returnDocument: "after",
+		})
+			.select(boardMembersProps)
+			.lean<BoardMember>()
+			.exec();
 		if (!board) throw new NotFoundError("Board not found");
 		return toMemberDTO(board);
 	},
 
 	deleteBoard: async (boardId: string) => {
-		const board = await Board.findByIdAndDelete(boardId);
+		const board = await Board.findByIdAndDelete(boardId)
+			.select(boardMembersProps)
+			.lean<BoardMember>()
+			.exec();
 		if (!board) throw new NotFoundError("Board not found");
 		if (board?.avatar?.public_id) {
 			UploadService.deleteImage(board.avatar.public_id).catch((err) => {
@@ -93,7 +99,9 @@ const boardService = {
 	},
 
 	updateBoardAvatar: async (boardId: string, file: Express.Multer.File) => {
-		const board = await Board.findById(boardId);
+		const board = await Board.findById(boardId)
+			.select(boardMembersProps)
+			.exec();
 		if (!board) throw new NotFoundError("Board not found");
 
 		if (board?.avatar?.public_id) {
@@ -123,7 +131,9 @@ const boardService = {
 	},
 
 	deleteBoardAvatar: async (boardId: string) => {
-		const board = await Board.findById(boardId);
+		const board = await Board.findById(boardId)
+			.select(boardMembersProps)
+			.exec();
 		if (!board) throw new NotFoundError("Board not found");
 
 		if (board?.avatar?.public_id) {
