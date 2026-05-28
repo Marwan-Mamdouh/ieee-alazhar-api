@@ -1,28 +1,20 @@
 import redis from "../../config/redis.js"; // your existing redis client
-import type {
-	BoardPosition,
-	BoardTrack,
-	MemberType,
-} from "../../modules/board/board.types.js";
+import type { GetBoard } from "../../modules/board/board.schema.js";
 
 // ─── Key Factory ────────────────────────────────────────────────────────────
 // Central place for all cache key shapes.
 // If you ever rename a key pattern, you change it here — nowhere else.
 
 export const CACHE_KEYS = {
-	boardList: (params: {
-		boardYear: number;
-		position?: BoardPosition[] | undefined;
-		memberType?: MemberType[] | undefined;
-		track?: BoardTrack[] | undefined;
-	}) => {
+	boardList: (params: GetBoard) => {
 		const {
-			boardYear,
+			yearFrom,
+			yearTo,
 			position = "all",
 			memberType = "all",
 			track = "all",
 		} = params;
-		return `boards:list:${boardYear}:pos=${position}:type=${memberType}:track=${track}`;
+		return `boards:list:${yearFrom}-${yearTo}:pos=${position}:type=${memberType}:track=${track}`;
 	},
 
 	// GET /boards/:boardId
