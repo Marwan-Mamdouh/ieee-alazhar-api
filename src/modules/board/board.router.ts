@@ -81,13 +81,12 @@ router.patch(
 	validate(updateBoardMemberSchema, "body"),
 	asyncHandler(
 		async (req: TypedRequest<UpdateBoardMember, BoardId>, res: Response) => {
+			const { boardId } = req.validatedParams!;
 			const result = await boardService.updateBoard(
-				req.validatedParams!.boardId,
+				boardId,
 				req.validatedBody!,
 			);
-			appEmitter.emitEvent(CACHE_EVENTS.BOARD_UPDATED, {
-				boardId: req.validatedParams!.boardId,
-			});
+			appEmitter.emitEvent(CACHE_EVENTS.BOARD_UPDATED, { boardId });
 			return res.json({ data: result });
 		},
 	),

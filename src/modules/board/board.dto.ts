@@ -10,7 +10,7 @@ export const toMemberDTO = (member: BoardDocument | BoardMember) => {
 		boardYear: member.boardYear,
 		position: member.position,
 		track: member.track,
-		// image_url: member.avatar?.url,
+		image_url: member.avatar?.url,
 		linkedin_url: member.linkedin_url,
 	};
 };

@@ -75,6 +75,6 @@ export interface BoardMember {
 	boardYear: number;
 	position: BoardPosition;
 	track?: BoardTrack;
-	image_url: string;
+	avatar: { url: string; public_id: string };
 	linkedin_url: string;
 }
