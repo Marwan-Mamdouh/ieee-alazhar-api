@@ -1,5 +1,5 @@
 import type { BoardMember } from "./board.types.js";
-import type { BoardDocument } from "./model.js";
+import type { BoardDocument } from "./board.model.js";
 
 export const toMemberDTO = (member: BoardDocument | BoardMember) => {
 	return {

@@ -3,7 +3,7 @@ import {
 	type BoardMember,
 	type MemberType,
 } from "./board.types.js";
-import Board from "./model.js";
+import Board from "./board.model.js";
 import type {
 	AddBoardMember,
 	GetBoard,
