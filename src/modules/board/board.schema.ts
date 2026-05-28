@@ -1,7 +1,6 @@
-import { Types } from "mongoose";
 import type { RefinementCtx } from "zod";
 
-import z from "../../util/zod.config.js";
+import z, { idSchema } from "../../util/zod.config.js";
 import {
 	BOARD_POSITIONS,
 	BOARD_TYPES,
@@ -225,17 +224,11 @@ export const getBoardSchema = z
 	})
 	.openapi("getBoardSchema");
 
-export const boardIdSchema = z
-	.object({
-		boardId: z
-			.string()
-			.length(24, "ObjectId must be exactly 24 characters long")
-			.refine((val) => Types.ObjectId.isValid(val), {
-				message: "Invalid MongoDB ObjectId format",
-			})
-			.openapi({ example: "64a7b9c8e1f2a3b4c5d6e7f" }),
-	})
-	.openapi("boardIdSchema");
+export const boardIdSchema = z.object({
+	boardId: idSchema("64a7b9c8e1f2a3b4c5d6e7f").openapi({
+		description: "MongoDB ObjectId of the board member",
+	}),
+});
 
 /**
  * PATCH Update Schema
