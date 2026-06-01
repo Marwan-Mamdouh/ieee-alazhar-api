@@ -4,7 +4,7 @@ import { ForbiddenError } from "../errors/app.error.js";
 const allowedOrigins = new Set([
 	"https://ieee-al-azhar-university.web.app",
 	"https://ieee-al-azhar-university.firebaseapp.com",
-	"https://ieee-alazhar-web.vercel.app/",
+	"https://ieee-alazhar-web.vercel.app",
 	"http://localhost:5173",
 	// "http://localhost:4173",
 ]);
