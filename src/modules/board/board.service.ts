@@ -24,7 +24,7 @@ const boardService = {
 
 		const groupedMembers = await Board.aggregate([])
 			.match(query) // Stage 1: Filter documents based on the query
-			.sort({ memberType: 1, _id: 1 }) // Stage 2: Sort documents *before* grouping
+			.sort({ name: 1, memberType: 1, _id: 1 }) // Stage 2: Sort documents *before* grouping
 			.group({
 				// Stage 3: Group by memberType and push the desired fields into a members array
 				_id: "$memberType", // Grouping key
