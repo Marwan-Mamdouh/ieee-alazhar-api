@@ -163,7 +163,7 @@ const boardYear = z
 
 const baseBoardMemberSchema = z.object({
 	name: z.string().min(1, "Name is required").openapi({ example: "John Doe" }),
-	bio: z.string().min(2).max(100).optional().openapi({
+	bio: z.string().min(2).max(500).optional().openapi({
 		example: "A passionate IEEE member with a love for technology.",
 	}),
 	linkedin_url,
@@ -246,7 +246,7 @@ export const updateBoardMemberSchema = z
 		bio: z
 			.string()
 			.min(2)
-			.max(100)
+			.max(500)
 			.optional()
 			.openapi({ example: "Updated biography text." }),
 		linkedin_url,
@@ -278,7 +278,7 @@ export const boardMemberDTO = z
 		bio: z
 			.string()
 			.min(2)
-			.max(100)
+			.max(500)
 			.openapi({ example: "A passionate IEEE member." }),
 		image: z
 			.object({
