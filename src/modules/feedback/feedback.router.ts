@@ -31,7 +31,7 @@ router.post(
 
 router.get(
 	"/",
-	// isAuthenticated,
+	isAuthenticated,
 	validate(paginationSchema, "query"),
 	asyncHandler(
 		async (
@@ -46,7 +46,7 @@ router.get(
 
 router.patch(
 	"/:id/status",
-	// isAuthenticated,
+	isAuthenticated,
 	validate(feedbackIdSchema, "params"),
 	validate(updateFeedbackStatusSchema, "body"),
 	asyncHandler(
