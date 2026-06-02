@@ -1,4 +1,4 @@
-import { Router, type Response } from "express";
+import { Router, type Response, type Request } from "express";
 
 import { validate } from "../../middlewares/validate.js";
 import {
@@ -39,6 +39,22 @@ router.get(
 			return res.json({ data: result });
 		},
 	),
+);
+
+router.get(
+	"/years",
+	httpCache({ strategy: "public", maxAge: 60 * 60 * 24 }),
+	asyncHandler(async (_: Request, res: Response) => {
+		const cacheKey = CACHE_KEYS.boardYears();
+
+		const result = await getCachedData(
+			cacheKey,
+			() => boardService.getBoardYears(),
+			TTL.BOARD_YEARS,
+		);
+
+		return res.json({ data: { years: result } });
+	}),
 );
 
 router.get(
