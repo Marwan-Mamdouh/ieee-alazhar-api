@@ -59,6 +59,14 @@ const boardService = {
 		}, initialOutput);
 	},
 
+	async getBoardYears() {
+		const years = await Board.distinct("boardYear")
+			.sort({ boardYear: -1 })
+			.exec();
+		console.log(years);
+		return years;
+	},
+
 	getBoardById: async (boardId: string) => {
 		const board = await Board.findById(boardId)
 			.select(boardMembersProps)

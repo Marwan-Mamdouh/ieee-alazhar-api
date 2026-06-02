@@ -24,15 +24,19 @@ export const CACHE_KEYS = {
 	boardPattern: (boardId: string) => `boards:*${boardId}*`,
 
 	// Wildcard for the entire boards list cache (e.g. when a member is added)
-	boardListPattern: () => `boards:list:*`,
+  boardListPattern: () => `boards:list:*`,
+
+  // boardYears
+  boardYears: () => `boards:years:*`,
 } as const;
 
 const cacheKeyPrefix = "cache:";
 
 // ─── TTL Constants ───────────────────────────────────────────────────────────
 export const TTL = {
-	BOARDS_LIST: 60 * 60 * 24, // 1 day — filtered lists change more often
-	BOARD_BY_ID: 60 * 60 * 12, // 12 hours — single board, more stable
+	BOARDS_LIST: 60 * 60 * 12, // 1 day — filtered lists change more often
+  BOARD_BY_ID: 60 * 60 * 24, // 12 hours — single board, more stable
+	BOARD_YEARS: 60 * 60 * 24, // 1 day — stable, changes infrequently
 } as const;
 
 // ─── Core Cache Helpers ──────────────────────────────────────────────────────
