@@ -42,6 +42,7 @@ const POSITION_VALIDATORS: Record<
 
 export interface BoardDocument extends Document {
 	name: string;
+	email: string;
 	bio: string;
 	avatar?: { url: string; public_id: string };
 	linkedin_url: string;
@@ -56,6 +57,7 @@ export interface BoardDocument extends Document {
 const boardSchema = new Schema<BoardDocument>(
 	{
 		name: { type: String, required: true },
+		email: { type: String, required: false },
 		bio: { type: String, required: false },
 		avatar: {
 			url: { type: String, required: false, default: "" },
@@ -107,6 +109,10 @@ const boardSchema = new Schema<BoardDocument>(
 //
 // Index for the memberType query (since you'll be filtering by multiple types)
 boardSchema.index({ boardYear: -1, memberType: 1, track: 1 });
+boardSchema.index(
+	{ email: 1, memberType: 1, position: 1, track: 1, boardYear: 1 },
+	{ unique: true, name: "unique_email_member_type_position_track_board_year" },
+);
 
 const Board = model<BoardDocument>("members", boardSchema);
 

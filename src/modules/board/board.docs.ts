@@ -53,6 +53,24 @@ registry.registerPath({
 });
 
 registry.registerPath({
+	method: "get",
+	path: "/api/v1/board/years",
+	tags: ["Board"],
+	summary: "Get all board years",
+	responses: {
+		200: {
+			description: "Successful response with board years",
+			content: {
+				"application/json": {
+					schema: z.array(z.number()),
+				},
+			},
+		},
+		500: { description: "Internal server error" },
+	},
+});
+
+registry.registerPath({
 	method: "post",
 	path: "/api/v1/board",
 	tags: ["Board"],
@@ -76,6 +94,11 @@ registry.registerPath({
 			},
 		},
 		400: { description: "Bad request due to invalid request body" },
+		401: { description: "Unauthorized due to missing authentication" },
+		403: { description: "Forbidden due to insufficient permissions" },
+		409: { description: "Board member already exists" },
+		422: { description: "Unprocessable entity due to invalid request body" },
+		429: { description: "Too many requests" },
 		500: { description: "Internal server error" },
 	},
 });
@@ -113,6 +136,11 @@ registry.registerPath({
 			},
 		},
 		400: { description: "Bad request due to invalid request body" },
+		401: { description: "Unauthorized due to missing authentication" },
+		403: { description: "Forbidden due to insufficient permissions" },
+		404: { description: "Board member not found" },
+		422: { description: "Unprocessable entity due to invalid request body" },
+		429: { description: "Too many requests" },
 		500: { description: "Internal server error" },
 	},
 });
@@ -142,6 +170,11 @@ registry.registerPath({
 			},
 		},
 		400: { description: "Bad request due to invalid request body" },
+		401: { description: "Unauthorized due to missing authentication" },
+		403: { description: "Forbidden due to insufficient permissions" },
+		404: { description: "Board member not found" },
+		422: { description: "Unprocessable entity due to invalid request body" },
+		429: { description: "Too many requests" },
 		500: { description: "Internal server error" },
 	},
 });
@@ -164,6 +197,11 @@ registry.registerPath({
 			},
 		},
 		400: { description: "Bad request due to invalid request params" },
+		401: { description: "Unauthorized due to missing authentication" },
+		403: { description: "Forbidden due to insufficient permissions" },
+		404: { description: "Board member not found" },
+		422: { description: "Unprocessable entity due to invalid request body" },
+		429: { description: "Too many requests" },
 		500: { description: "Internal server error" },
 	},
 });
@@ -186,6 +224,11 @@ registry.registerPath({
 			},
 		},
 		400: { description: "Bad request due to invalid request params" },
+		401: { description: "Unauthorized due to missing authentication" },
+		403: { description: "Forbidden due to insufficient permissions" },
+		404: { description: "Board member not found" },
+		422: { description: "Unprocessable entity due to invalid request body" },
+		429: { description: "Too many requests" },
 		500: { description: "Internal server error" },
 	},
 });
