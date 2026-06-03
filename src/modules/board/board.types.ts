@@ -58,7 +58,7 @@ export const ALL_TRACKS = [
 ] as const;
 
 export const boardMembersProps =
-	"_id name bio memberType boardYear position track avatar linkedin_url" as const;
+	"_id name email bio memberType boardYear position track avatar linkedin_url" as const;
 
 export type BoardPosition = (typeof BOARD_POSITIONS)[number];
 export type MemberType = (typeof BOARD_TYPES)[number];
@@ -73,11 +73,12 @@ export type BoardTrack = (typeof ALL_TRACKS)[number];
 export interface BoardMember {
 	_id: string | ObjectId;
 	name: string;
+	email: string;
 	bio: string;
 	memberType: MemberType;
 	boardYear: number;
 	position: BoardPosition;
 	track?: BoardTrack;
-	avatar: { url: string; public_id: string };
+	avatar?: { url: string; public_id: string };
 	linkedin_url: string;
 }

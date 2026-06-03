@@ -166,6 +166,7 @@ const baseBoardMemberSchema = z.object({
 	bio: z.string().min(2).max(500).optional().openapi({
 		example: "A passionate IEEE member with a love for technology.",
 	}),
+	email: z.email().optional().openapi({ example: "john.doe@example.com" }),
 	linkedin_url,
 	boardYear,
 	createdAt: z.date().optional(),
@@ -249,6 +250,7 @@ export const updateBoardMemberSchema = z
 			.max(500)
 			.optional()
 			.openapi({ example: "Updated biography text." }),
+		email: z.email().optional().openapi({ example: "john.doe@example.com" }),
 		linkedin_url,
 		boardYear,
 		memberType: z
@@ -280,6 +282,7 @@ export const boardMemberDTO = z
 			.min(2)
 			.max(500)
 			.openapi({ example: "A passionate IEEE member." }),
+		email: z.email().optional().openapi({ example: "john.doe@example.com" }),
 		image: z
 			.object({
 				url: z.url().min(2).max(1024).openapi({
