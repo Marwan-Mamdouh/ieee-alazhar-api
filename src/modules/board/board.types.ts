@@ -49,7 +49,7 @@ export const BRANDING_TRACKS = [
 	"photography",
 ] as const;
 
-export const OPERATION_TRACKS = ["pr", "logistic", "hr"] as const;
+export const OPERATION_TRACKS = ["pr", "logistic", "hr", "operation management"] as const;
 
 export const ALL_TRACKS = [
 	...TECHNICAL_TRACKS,
