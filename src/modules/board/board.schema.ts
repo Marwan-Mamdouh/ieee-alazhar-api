@@ -111,14 +111,12 @@ const parseQueryArray = <T extends readonly string[]>(enumArray: T) => {
 
 const boardMemberRoleSchema = z.discriminatedUnion("memberType", [
 	// 1. Officer Branch
-	z.object({
-		memberType: z.literal("officer"),
-		position: validateEnumString(OFFICER_POSITIONS),
-		track: z
-			.string()
-			.optional()
-			.transform(() => undefined),
-	}),
+	z
+		.object({
+			memberType: z.literal("officer"),
+			position: validateEnumString(OFFICER_POSITIONS),
+		})
+		.strict(),
 	// 2. Technical Branch
 	z.object({
 		memberType: z.literal("technical"),
@@ -158,7 +156,6 @@ const boardYear = z
 				"Year cannot be more than 5 years in the future",
 			),
 	)
-	.default(() => new Date().getFullYear())
 	.openapi({ example: 2026 });
 
 const baseBoardMemberSchema = z.object({
@@ -168,7 +165,7 @@ const baseBoardMemberSchema = z.object({
 	}),
 	email: z.email().optional().openapi({ example: "john.doe@example.com" }),
 	linkedin_url,
-	boardYear,
+	boardYear: boardYear.default(() => new Date().getFullYear()),
 	createdAt: z.date().optional(),
 });
 
@@ -222,6 +219,13 @@ export const getBoardSchema = z
 				path: ["yearFrom"],
 			});
 		}
+		if (data.yearTo - data.yearFrom >= 5) {
+			ctx.addIssue({
+				code: "custom",
+				message: `The range between yearFrom and yearTo cannot exceed 5 years.`,
+				path: ["yearTo"],
+			});
+		}
 	})
 	.openapi("getBoardSchema");
 
@@ -252,7 +256,7 @@ export const updateBoardMemberSchema = z
 			.openapi({ example: "Updated biography text." }),
 		email: z.email().optional().openapi({ example: "john.doe@example.com" }),
 		linkedin_url,
-		boardYear,
+		boardYear: boardYear.optional(),
 		memberType: z
 			.enum(BOARD_TYPES)
 			.optional()
@@ -281,6 +285,7 @@ export const boardMemberDTO = z
 			.string()
 			.min(2)
 			.max(500)
+			.optional()
 			.openapi({ example: "A passionate IEEE member." }),
 		email: z.email().optional().openapi({ example: "john.doe@example.com" }),
 		image: z
