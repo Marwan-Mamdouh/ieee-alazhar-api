@@ -1,11 +1,13 @@
 import type { ObjectId } from "mongoose";
 
+export const GENDERS = ["male", "female"] as const;
+
 export const OFFICER_POSITIONS = [
 	"chair",
-	"treasurer",
-	"secretary",
 	"vice technical",
 	"vice branding",
+	"secretary",
+	"treasurer",
 ] as const;
 export const COMMITTEE_POSITIONS = ["head", "vice"] as const;
 
@@ -49,7 +51,12 @@ export const BRANDING_TRACKS = [
 	"photography",
 ] as const;
 
-export const OPERATION_TRACKS = ["pr", "logistic", "hr", "operation management"] as const;
+export const OPERATION_TRACKS = [
+	"pr&fr",
+	"logistic",
+	"hr",
+	"operation management",
+] as const;
 
 export const ALL_TRACKS = [
 	...TECHNICAL_TRACKS,
@@ -58,8 +65,9 @@ export const ALL_TRACKS = [
 ] as const;
 
 export const boardMembersProps =
-	"_id name email bio memberType boardYear position track avatar linkedin_url" as const;
+	"_id name email bio gender memberType boardYear position track avatar linkedin_url" as const;
 
+export type Gender = (typeof GENDERS)[number];
 export type BoardPosition = (typeof BOARD_POSITIONS)[number];
 export type MemberType = (typeof BOARD_TYPES)[number];
 export type OfficerPosition = (typeof OFFICER_POSITIONS)[number];
@@ -72,13 +80,14 @@ export type BoardTrack = (typeof ALL_TRACKS)[number];
 
 export interface BoardMember {
 	_id: string | ObjectId;
+	bio: string;
 	name: string;
 	email: string;
-	bio: string;
-	memberType: MemberType;
+	gender: Gender;
 	boardYear: number;
-	position: BoardPosition;
 	track?: BoardTrack;
-	avatar?: { url: string; public_id: string };
 	linkedin_url: string;
+	memberType: MemberType;
+	position: BoardPosition;
+	avatar?: { url: string; public_id: string };
 }
