@@ -1,7 +1,10 @@
 import {
 	boardMembersProps,
+	OFFICER_POSITIONS,
+	BOARD_TYPES,
 	type BoardMember,
 	type MemberType,
+	type OfficerPosition,
 } from "./board.types.js";
 import Board from "./board.model.js";
 import type {
@@ -18,16 +21,14 @@ const boardService = {
 		const query = {
 			boardYear: { $gte: data.yearFrom, $lte: data.yearTo },
 			...(data.memberType && { memberType: { $in: data.memberType } }),
-			...(data.position && { position: { $in: data.position } }),
 			...(data.track && { track: { $in: data.track } }),
+			...(data.position && { position: { $in: data.position } }),
 		};
 
 		const groupedMembers = await Board.aggregate([])
-			.match(query) // Stage 1: Filter documents based on the query
-			.sort({ name: 1, memberType: 1, _id: 1 }) // Stage 2: Sort documents *before* grouping
+			.match(query)
 			.group({
-				// Stage 3: Group by memberType and push the desired fields into a members array
-				_id: "$memberType", // Grouping key
+				_id: "$memberType",
 				members: {
 					$push: {
 						_id: "$_id",
@@ -44,7 +45,6 @@ const boardService = {
 			})
 			.exec();
 
-		// Shape the final object dynamically in TypeScript
 		const initialOutput: Record<MemberType, BoardMember[]> = {
 			officer: [],
 			technical: [],
@@ -52,11 +52,21 @@ const boardService = {
 			operation: [],
 		};
 
-		return groupedMembers.reduce((acc, currentGroup) => {
-			// Format each member using your DTO function
-			acc[currentGroup._id] = currentGroup.members.map(toMemberDTO);
+		const unsortedResult = groupedMembers.reduce((acc, currentGroup) => {
+			acc[currentGroup._id] = sortMembers(
+				currentGroup._id,
+				currentGroup.members.map(toMemberDTO),
+			);
 			return acc;
 		}, initialOutput);
+		// Sort the groups themselves: officer → technical → branding → operation
+		return Object.fromEntries(
+			Object.entries(unsortedResult).sort(
+				([a], [b]) =>
+					BOARD_TYPES.indexOf(a as MemberType) -
+					BOARD_TYPES.indexOf(b as MemberType),
+			),
+		);
 	},
 
 	async getBoardYears() {
@@ -154,6 +164,30 @@ const boardService = {
 		const savedBoard = await board.save();
 		return toMemberDTO(savedBoard);
 	},
+};
+
+const sortMembers = (
+	memberType: MemberType,
+	members: BoardMember[],
+): BoardMember[] => {
+	if (memberType === "officer") {
+		return members.sort(
+			(a, b) =>
+				OFFICER_POSITIONS.indexOf(a.position as OfficerPosition) -
+				OFFICER_POSITIONS.indexOf(b.position as OfficerPosition),
+		);
+	}
+
+	return members.sort((a, b) => {
+		// 1. Sort by track A → Z
+		const trackCmp = (a.track ?? "").localeCompare(b.track ?? "");
+		if (trackCmp !== 0) return trackCmp;
+
+		// 2. Within same track: head before vice
+		if (a.position === "head") return -1;
+		if (b.position === "head") return 1;
+		return 0;
+	});
 };
 
 export default boardService;
