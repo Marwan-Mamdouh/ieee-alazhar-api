@@ -7,9 +7,11 @@ import {
 	TECHNICAL_TRACKS,
 	BRANDING_TRACKS,
 	OPERATION_TRACKS,
+	GENDERS,
 	type BoardPosition,
 	type MemberType,
 	type BoardTrack,
+	type Gender,
 } from "./board.types.js";
 
 // immutable validation strategy map
@@ -42,6 +44,7 @@ const POSITION_VALIDATORS: Record<
 
 export interface BoardDocument extends Document {
 	name: string;
+	gender?: Gender;
 	email: string;
 	bio: string;
 	avatar?: { url: string; public_id: string };
@@ -57,6 +60,7 @@ export interface BoardDocument extends Document {
 const boardSchema = new Schema<BoardDocument>(
 	{
 		name: { type: String, required: true },
+		gender: { type: String, enum: GENDERS, required: false },
 		email: { type: String, required: false },
 		bio: { type: String, required: false },
 		avatar: {
@@ -69,7 +73,6 @@ const boardSchema = new Schema<BoardDocument>(
 			enum: BOARD_POSITIONS,
 			required: true,
 			validate: {
-				// Zero if statements: Uses the position strategy map
 				validator: function (this: any, position: BoardPosition) {
 					return (
 						POSITION_VALIDATORS[this.memberType as MemberType]?.(position) ??
@@ -83,15 +86,15 @@ const boardSchema = new Schema<BoardDocument>(
 		memberType: { type: String, enum: BOARD_TYPES, required: true },
 		track: {
 			type: String,
-			required: function (this: any) {
+			required: function (this: BoardDocument) {
 				return this.memberType !== "officer";
 			},
 			validate: {
-				// Zero if statements: Uses the track strategy map
-				validator: function (this: any, track: BoardTrack | undefined) {
-					return (
-						TRACK_VALIDATORS[this.memberType as MemberType]?.(track) ?? false
-					);
+				validator: function (
+					this: BoardDocument,
+					track: BoardTrack | undefined,
+				) {
+					return TRACK_VALIDATORS[this.memberType]?.(track) ?? false;
 				},
 				message: (props: any) =>
 					`${props.value} is not a valid track for the selected member type!`,
@@ -102,16 +105,29 @@ const boardSchema = new Schema<BoardDocument>(
 	{ timestamps: true },
 );
 
-// id, name, position, image_url AS image, bio, linkedin_url AS linkedin, board_type, year
-// - member_type	- Enum [officer -  technical - branding - operation]
-// - position	- Enum for member type officer [treasurer - secretary - vice]
-// - position	- Enum for any other member type [head - vice]
-//
 // Index for the memberType query (since you'll be filtering by multiple types)
-boardSchema.index({ boardYear: -1, memberType: 1, track: 1 });
+boardSchema.index({ boardYear: -1, memberType: 1, track: 1, position: 1 });
+// For committee members: email + track + year must be unique
 boardSchema.index(
-	{ email: 1, memberType: 1, position: 1, track: 1, boardYear: 1 },
-	{ unique: true, name: "unique_email_member_type_position_track_board_year" },
+	{ email: 1, track: 1, boardYear: 1 },
+	{
+		unique: true,
+		name: "unique_member_track_year",
+		partialFilterExpression: { track: { $exists: true } },
+	},
+);
+
+// For officers: email + position + year must be unique
+// (an officer can't hold the same position twice in the same year)
+boardSchema.index(
+	{ email: 1, position: 1, boardYear: 1 },
+	{
+		unique: true,
+		name: "unique_officer_position_year",
+		partialFilterExpression: {
+			memberType: "officer",
+		},
+	},
 );
 
 const Board = model<BoardDocument>("members", boardSchema);
