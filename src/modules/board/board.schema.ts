@@ -10,6 +10,7 @@ import {
 	BRANDING_TRACKS,
 	OPERATION_TRACKS,
 	ALL_TRACKS,
+    GENDERS,
 } from "./board.types.js";
 
 const ALLOWED_POSITIONS = {
@@ -307,6 +308,7 @@ export const boardMemberDTO = z
 			.optional()
 			.openapi({ example: "back end" }), // Included track in payload
 		boardYear,
+		gender: z.enum(GENDERS).optional().openapi({ example: "male" }),
 	})
 	.openapi("BoardMemberDTO");
 

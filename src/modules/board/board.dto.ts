@@ -7,6 +7,7 @@ export const toMemberDTO = (member: BoardDocument | BoardMember) => {
 		name: member.name,
 		bio: member.bio,
 		email: member.email,
+		gender: member.gender,
 		memberType: member.memberType,
 		boardYear: member.boardYear,
 		position: member.position,

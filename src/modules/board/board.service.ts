@@ -34,6 +34,8 @@ const boardService = {
 						_id: "$_id",
 						name: "$name",
 						bio: "$bio",
+						gender: "$gender",
+						email: "$email",
 						avatar: "$avatar",
 						linkedin_url: "$linkedin_url",
 						position: "$position",
