@@ -37,6 +37,7 @@ const feedbackService = {
 		const feedbacks = await FeedbackModel.find()
 			.select(feedbackProps)
 			.lean<FeedbackItem[]>()
+			.sort({ createdAt: -1 })
 			.skip((page - 1) * limit)
 			.limit(limit)
 			.exec();
