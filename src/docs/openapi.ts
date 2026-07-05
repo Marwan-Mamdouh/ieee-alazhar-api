@@ -3,6 +3,9 @@ import { OpenApiGeneratorV3 } from "@asteasolutions/zod-to-openapi";
 
 import { registry } from "../util/registry.js";
 import "../modules/board/board.docs.js";
+import "../modules/feedback/feedback.docs.js";
+import "../modules/committees/committees.docs.js";
+import "../modules/events/events.docs.js";
 import auth from "../util/auth.js";
 
 export const generateOpenAPIDocument = async () => {
