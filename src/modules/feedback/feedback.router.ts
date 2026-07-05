@@ -53,7 +53,7 @@ router.patch(
 		async (
 			req: TypedRequest<UpdateFeedbackStatusDTO, FeedbackId>,
 			res: Response,
-		) => {
+    ) => {
 			const result = await feedbackService.updateFeedbackStatus(
 				req.validatedParams!.id,
 				req.validatedBody!,

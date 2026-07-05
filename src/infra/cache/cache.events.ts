@@ -9,10 +9,10 @@ export const CACHE_EVENTS = {
 	BOARD_MEMBER_ADDED: "board:member:added",
 } as const;
 
-export type CacheEvent = (typeof CACHE_EVENTS)[keyof typeof CACHE_EVENTS];
+type CacheEvent = (typeof CACHE_EVENTS)[keyof typeof CACHE_EVENTS];
 
 // Payload shapes per event — this is what prevents silent bugs
-export interface CacheEventPayloads {
+interface CacheEventPayloads {
 	[CACHE_EVENTS.BOARD_UPDATED]: { boardId: string };
 	[CACHE_EVENTS.BOARD_DELETED]: { boardId: string };
 	[CACHE_EVENTS.BOARD_AVATAR_UPDATED]: { boardId: string };

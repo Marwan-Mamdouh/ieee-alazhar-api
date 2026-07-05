@@ -1,7 +1,7 @@
 import Transporter from "../../config/mailer.js";
 import env from "../../config/env.js";
 
-export interface MailOptions {
+interface MailOptions {
 	to: string;
 	subject: string;
 	message: string;
