@@ -19,6 +19,9 @@ const envSchema = z.object({
     .default("development"),
   MAIL_USER: z.string().optional(),
   MAIL_APP_PASSWORD: z.string().optional(),
+  SANITY_PROJECT_ID: z.string(),
+  SANITY_DATASET: z.string(),
+  SANITY_USE_CDN: z.coerce.boolean().default(false),
 });
 
 const env = envSchema.safeParse(process.env);

@@ -28,15 +28,28 @@ export const CACHE_KEYS = {
 
   // boardYears
   boardYears: () => `boards:years:*`,
+
+  // GET /committees
+  committeesList: () => `committees:list`,
+
+  // GET /events
+  eventsList: () => `events:list`,
+
+  // GET /events/:id
+  eventById: (id: string) => `events:id:${id}`,
 } as const;
 
 const cacheKeyPrefix = "cache:";
 
 // ─── TTL Constants ───────────────────────────────────────────────────────────
 export const TTL = {
-	BOARDS_LIST: 60 * 60 * 12, // 1 day — filtered lists change more often
-  BOARD_BY_ID: 60 * 60 * 24, // 12 hours — single board, more stable
+	BOARDS_LIST: 60 * 60 * 12, // 12 hours — filtered lists change more often
+	BOARD_BY_ID: 60 * 60 * 24, // 1 day — single board, more stable
 	BOARD_YEARS: 60 * 60 * 24, // 1 day — stable, changes infrequently
+	// Sanity read-only proxies — no invalidation, short TTL by design
+	COMMITTEES_LIST: 5 * 60,   // 5 minutes
+	EVENTS_LIST: 5 * 60,        // 5 minutes
+	EVENT_BY_ID: 10 * 60,       // 10 minutes — detail pages are more stable
 } as const;
 
 // ─── Core Cache Helpers ──────────────────────────────────────────────────────
