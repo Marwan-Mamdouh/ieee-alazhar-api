@@ -25,7 +25,7 @@ const router = Router();
 router.get(
   "/",
   validate(getBoardSchema, "query"),
-  // httpCache({ strategy: "public", maxAge: 60 * 60 * 24 }), // 1 day
+  httpCache({ strategy: "public" }),
   asyncHandler(
     async (req: TypedRequest<unknown, unknown, GetBoard>, res: Response) => {
       const cacheKey = CACHE_KEYS.boardList(req.validatedQuery!);
@@ -43,7 +43,7 @@ router.get(
 
 router.get(
   "/years",
-  httpCache({ strategy: "public", maxAge: 60 * 60 * 24 }),
+  httpCache({ strategy: "public" }),
   asyncHandler(async (_: Request, res: Response) => {
     const cacheKey = CACHE_KEYS.boardYears();
 
@@ -59,7 +59,7 @@ router.get(
 
 router.get(
   "/:boardId",
-  // httpCache({ strategy: "public", maxAge: 60 * 60 * 3 }), // 3 hours
+  httpCache({ strategy: "public" }),
   validate(boardIdSchema, "params"),
   asyncHandler(async (req: TypedRequest<unknown, BoardId>, res: Response) => {
     const { boardId } = req.validatedParams!;
@@ -81,7 +81,6 @@ router.post(
   upload.single("avatar"),
   validate(addBoardMemberSchema),
   asyncHandler(async (req: TypedRequest<AddBoardMember>, res: Response) => {
-    console.log(req.validatedBody!, req.file!);
     const result = await boardService.addMember(req.validatedBody!, req.file!);
 
     appEmitter.emitEvent(CACHE_EVENTS.BOARD_MEMBER_ADDED, {
@@ -107,6 +106,7 @@ router.patch(
         req.file!,
       );
       appEmitter.emitEvent(CACHE_EVENTS.BOARD_UPDATED, { boardId });
+      // console.log(result);
       return res.json({ data: result });
     },
   ),

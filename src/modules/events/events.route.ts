@@ -6,38 +6,39 @@ import { getCachedData, CACHE_KEYS, TTL } from "../../infra/cache/cache.js";
 import { eventIdSchema, type EventId } from "./events.schema.js";
 import type { TypedRequest } from "../../types/TypedRequest.js";
 import eventsService from "./events.service.js";
+import { httpCache } from "../../middlewares/http.caching.js";
 
 const router = Router();
 
-// GET /api/v1/events
 router.get(
-	"/",
-	asyncHandler(async (_: Request, res: Response) => {
-		const result = await getCachedData(
-			CACHE_KEYS.eventsList(),
-			() => eventsService.getEvents(),
-			TTL.EVENTS_LIST,
-		);
+  "/",
+  httpCache({ strategy: "public" }),
+  asyncHandler(async (_: Request, res: Response) => {
+    const result = await getCachedData(
+      CACHE_KEYS.eventsList(),
+      () => eventsService.getEvents(),
+      TTL.EVENTS_LIST,
+    );
 
-		return res.json({ data: result });
-	}),
+    return res.json({ data: result });
+  }),
 );
 
-// GET /api/v1/events/:id
 router.get(
-	"/:id",
-	validate(eventIdSchema, "params"),
-	asyncHandler(async (req: TypedRequest<unknown, EventId>, res: Response) => {
-		const { id } = req.validatedParams!;
+  "/:id",
+  validate(eventIdSchema, "params"),
+  httpCache({ strategy: "public" }),
+  asyncHandler(async (req: TypedRequest<unknown, EventId>, res: Response) => {
+    const { id } = req.validatedParams!;
 
-		const result = await getCachedData(
-			CACHE_KEYS.eventById(id),
-			() => eventsService.getEventById(id),
-			TTL.EVENT_BY_ID,
-		);
+    const result = await getCachedData(
+      CACHE_KEYS.eventById(id),
+      () => eventsService.getEventById(id),
+      TTL.EVENT_BY_ID,
+    );
 
-		return res.json({ data: result });
-	}),
+    return res.json({ data: result });
+  }),
 );
 
 export default router;

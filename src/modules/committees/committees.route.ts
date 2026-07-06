@@ -3,20 +3,22 @@ import { Router, type Request, type Response } from "express";
 import asyncHandler from "../../util/async.handler.js";
 import { getCachedData, CACHE_KEYS, TTL } from "../../infra/cache/cache.js";
 import committeesService from "./committees.service.js";
+import { httpCache } from "../../middlewares/http.caching.js";
 
 const router = Router();
 
 router.get(
-	"/",
-	asyncHandler(async (_: Request, res: Response) => {
-		const result = await getCachedData(
-			CACHE_KEYS.committeesList(),
-			() => committeesService.getCommittees(),
-			TTL.COMMITTEES_LIST,
-		);
+  "/",
+  httpCache({ strategy: "public" }),
+  asyncHandler(async (_: Request, res: Response) => {
+    const result = await getCachedData(
+      CACHE_KEYS.committeesList(),
+      () => committeesService.getCommittees(),
+      TTL.COMMITTEES_LIST,
+    );
 
-		return res.json({ data: result });
-	}),
+    return res.json({ data: result });
+  }),
 );
 
 export default router;
