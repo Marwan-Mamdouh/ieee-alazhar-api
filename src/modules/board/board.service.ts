@@ -75,7 +75,6 @@ const boardService = {
     const years = await Board.distinct("boardYear")
       .sort({ boardYear: -1 })
       .exec();
-    console.log(years);
     return years;
   },
 
