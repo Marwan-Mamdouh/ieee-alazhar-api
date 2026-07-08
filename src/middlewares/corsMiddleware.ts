@@ -12,7 +12,7 @@ const corsMiddleware = cors({
     if (!origin || allowedOrigins.has(origin)) cb(null, true);
     else cb(new ForbiddenError("Not allowed by CORS"));
   },
-  methods: ["GET", "POST", "PATCH", "DELETE"],
+  methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
   credentials: true,
   allowedHeaders: ["Content-Type", "Authorization"],
 });
