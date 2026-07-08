@@ -10,7 +10,7 @@ const ALLOWED_MIME_TYPES = new Set<string>([
 	"image/webp",
 ]);
 
-const MAX_SIZE_MB = 6;
+const MAX_SIZE_MB = 10;
 
 const fileFilter = (
 	_: Request,
