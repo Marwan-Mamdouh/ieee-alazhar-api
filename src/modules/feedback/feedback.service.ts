@@ -34,14 +34,30 @@ const feedbackService = {
 
   async getFeedbacks(validatedQuery: PaginationParams) {
     const { page, limit } = validatedQuery;
-    const feedbacks = await FeedbackModel.find()
+
+    const query = FeedbackModel.find()
       .select(feedbackProps)
       .lean<FeedbackItem[]>()
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
-      .limit(limit)
-      .exec();
-    return feedbacks.map(toFeedbackDTO);
+      .limit(limit);
+
+    const [feedbacks, totalCount] = await Promise.all([
+      query.exec(),
+      FeedbackModel.countDocuments().exec(),
+    ]);
+
+    return {
+      data: feedbacks.map(toFeedbackDTO),
+      meta: {
+        totalItems: totalCount,
+        totalPages: Math.ceil(totalCount / limit),
+        currentPage: page,
+        itemsPerPage: limit,
+        hasNextPage: page < Math.ceil(totalCount / limit),
+        hasPrevPage: page > 1,
+      },
+    };
   },
 
   async deleteFeedback(id: string) {

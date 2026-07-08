@@ -41,7 +41,7 @@ router.get(
       res: Response,
     ) => {
       const result = await feedbackService.getFeedbacks(req.validatedQuery!);
-      res.json({ data: result });
+      res.json(result);
     },
   ),
 );
