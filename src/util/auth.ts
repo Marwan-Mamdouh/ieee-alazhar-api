@@ -15,9 +15,7 @@ const auth = betterAuth({
 		window: 60 * 5,
 		max: 10,
 	},
-	advanced: {
-		disableOriginCheck: env.NODE_ENV !== "production",
-	},
+	advanced: { disableOriginCheck: true },
 	plugins: [
 		openAPI(),
 		emailOTP({
