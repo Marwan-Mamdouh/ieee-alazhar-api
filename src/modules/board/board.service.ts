@@ -89,7 +89,7 @@ const boardService = {
 
   addMember: async (
     member: AddBoardMember,
-    memberAvatar: Express.Multer.File,
+    memberAvatar?: Express.Multer.File,
   ) => {
     const board = new Board(member);
     if (memberAvatar) {
@@ -113,7 +113,7 @@ const boardService = {
   updateBoard: async (
     boardId: string,
     boardData: UpdateBoardMember,
-    boardAvatar: Express.Multer.File,
+    boardAvatar?: Express.Multer.File,
   ) => {
     const board = await Board.findById(boardId);
     if (!board) throw new NotFoundError("Board not found");

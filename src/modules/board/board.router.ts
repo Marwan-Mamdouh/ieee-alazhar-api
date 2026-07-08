@@ -81,7 +81,7 @@ router.post(
   upload.single("avatar"),
   validate(addBoardMemberSchema),
   asyncHandler(async (req: TypedRequest<AddBoardMember>, res: Response) => {
-    const result = await boardService.addMember(req.validatedBody!, req.file!);
+    const result = await boardService.addMember(req.validatedBody!, req.file);
 
     appEmitter.emitEvent(CACHE_EVENTS.BOARD_MEMBER_ADDED, {
       boardId: result.id, // adjust to match your actual return shape
@@ -103,10 +103,9 @@ router.patch(
       const result = await boardService.updateBoard(
         boardId,
         req.validatedBody!,
-        req.file!,
+        req.file,
       );
       appEmitter.emitEvent(CACHE_EVENTS.BOARD_UPDATED, { boardId });
-      // console.log(result);
       return res.json({ data: result });
     },
   ),

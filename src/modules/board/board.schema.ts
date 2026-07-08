@@ -11,20 +11,9 @@ import {
   OPERATION_TRACKS,
   ALL_TRACKS,
   GENDERS,
+  ALLOWED_POSITIONS_BY_TYPE,
+  ALLOWED_TRACKS_BY_TYPE,
 } from "./board.types.js";
-
-const ALLOWED_POSITIONS = {
-  officer: OFFICER_POSITIONS,
-  technical: COMMITTEE_POSITIONS,
-  branding: COMMITTEE_POSITIONS,
-  operation: COMMITTEE_POSITIONS,
-} as const;
-
-const ALLOWED_TRACKS = {
-  technical: TECHNICAL_TRACKS,
-  branding: BRANDING_TRACKS,
-  operation: OPERATION_TRACKS,
-} as const;
 
 type CrossFieldUpdatePayload = {
   memberType?: (typeof BOARD_TYPES)[number] | undefined;
@@ -63,7 +52,7 @@ const verifyStructuralAlignment = (
   }
 
   // Rule 4: Match position against allowed list for that specific member type.
-  const validPositions = ALLOWED_POSITIONS[memberType!];
+  const validPositions = ALLOWED_POSITIONS_BY_TYPE[memberType!];
   if (
     position &&
     !(validPositions as ReadonlyArray<string>).includes(position)
@@ -78,7 +67,7 @@ const verifyStructuralAlignment = (
   // Rule 5: Match track against allowed list for committee types.
   if (memberType !== "officer" && track) {
     const validTracks =
-      ALLOWED_TRACKS[memberType as keyof typeof ALLOWED_TRACKS];
+      ALLOWED_TRACKS_BY_TYPE[memberType as keyof typeof ALLOWED_TRACKS_BY_TYPE];
     if (
       !validTracks ||
       !(validTracks as ReadonlyArray<string>).includes(track)
