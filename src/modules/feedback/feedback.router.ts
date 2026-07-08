@@ -66,4 +66,16 @@ router.patch(
   ),
 );
 
+router.delete(
+  "/:id",
+  isAuthenticated,
+  validate(feedbackIdSchema, "params"),
+  asyncHandler(
+    async (req: TypedRequest<unknown, FeedbackId>, res: Response) => {
+      await feedbackService.deleteFeedback(req.validatedParams!.id);
+      res.sendStatus(204);
+    },
+  ),
+);
+
 export default router;
