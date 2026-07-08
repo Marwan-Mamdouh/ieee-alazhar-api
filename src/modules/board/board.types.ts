@@ -64,6 +64,24 @@ export const ALL_TRACKS = [
   ...OPERATION_TRACKS,
 ] as const;
 
+export const ALLOWED_POSITIONS_BY_TYPE: Record<
+  MemberType,
+  readonly BoardPosition[]
+> = {
+  officer: OFFICER_POSITIONS,
+  technical: COMMITTEE_POSITIONS,
+  branding: COMMITTEE_POSITIONS,
+  operation: COMMITTEE_POSITIONS,
+};
+
+export const ALLOWED_TRACKS_BY_TYPE: Partial<
+  Record<MemberType, readonly BoardTrack[]>
+> = {
+  technical: TECHNICAL_TRACKS,
+  branding: BRANDING_TRACKS,
+  operation: OPERATION_TRACKS,
+};
+
 export const boardMembersProps =
   "_id name email bio gender memberType boardYear position track avatar linkedin_url" as const;
 
@@ -71,11 +89,7 @@ export type Gender = (typeof GENDERS)[number];
 export type BoardPosition = (typeof BOARD_POSITIONS)[number];
 export type MemberType = (typeof BOARD_TYPES)[number];
 export type OfficerPosition = (typeof OFFICER_POSITIONS)[number];
-type CommitteePosition = (typeof COMMITTEE_POSITIONS)[number];
 
-type TechnicalTrack = (typeof TECHNICAL_TRACKS)[number];
-type BrandingTrack = (typeof BRANDING_TRACKS)[number];
-type OperationTrack = (typeof OPERATION_TRACKS)[number];
 export type BoardTrack = (typeof ALL_TRACKS)[number];
 
 export interface BoardMember {
