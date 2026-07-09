@@ -1,4 +1,4 @@
-import * as helmet from "helmet";
+import helmet from "helmet";
 import compression from "compression";
 import express, { json, type Response } from "express";
 import { toNodeHandler } from "better-auth/node";
