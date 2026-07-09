@@ -5,11 +5,11 @@ config();
 
 const envSchema = z.object({
   PORT: z.coerce.number().optional().default(3000),
-  FRONTEND_URL: z.string().optional(),
-  MONGO_URI: z.string().optional(),
+  FRONTEND_URL: z.url(),
+  MONGO_URI: z.string(),
   MONGO_DB_NAME: z.string().optional(),
-  BETTER_AUTH_SECRET: z.string().optional(),
-  BETTER_AUTH_URL: z.string().optional(),
+  BETTER_AUTH_SECRET: z.string(),
+  BETTER_AUTH_URL: z.url(),
   CLOUDINARY_CLOUD_NAME: z.string(),
   CLOUDINARY_API_KEY: z.string(),
   CLOUDINARY_API_SECRET: z.string(),
