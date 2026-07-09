@@ -15,6 +15,10 @@ const auth = betterAuth({
 		window: 60 * 5,
 		max: 10,
 	},
+  baseUrl: env.FRONTEND_URL,
+  trustedOrigins: [
+      env.FRONTEND_URL
+    ],
 	advanced: { disableOriginCheck: true },
 	plugins: [
 		openAPI(),
