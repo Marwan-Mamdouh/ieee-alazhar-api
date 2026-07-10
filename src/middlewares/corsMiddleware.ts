@@ -3,6 +3,7 @@ import { ForbiddenError } from "../errors/app.error.js";
 
 const allowedOrigins = new Set([
   "https://ieee-website-phi.vercel.app",
+  "https://ieee-website-steel.vercel.app",
   "http://localhost:5173",
   // "http://localhost:4173",
 ]);

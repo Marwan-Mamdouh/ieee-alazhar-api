@@ -18,7 +18,8 @@ const auth = betterAuth({
   baseUrl: env.BETTER_AUTH_URL,
   trustedOrigins: [
     env.FRONTEND_URL,
-    `http://localhost:5173`
+    "https://ieee-website-steel.vercel.app",
+    `http://localhost:5173`,
     ],
 	plugins: [
 		openAPI(),
