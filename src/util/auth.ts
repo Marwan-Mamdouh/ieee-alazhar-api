@@ -15,11 +15,11 @@ const auth = betterAuth({
 		window: 60 * 5,
 		max: 10,
 	},
-  baseUrl: env.FRONTEND_URL,
+  baseUrl: env.BETTER_AUTH_URL,
   trustedOrigins: [
-      env.FRONTEND_URL
+    env.FRONTEND_URL,
+    `http://localhost:5173`
     ],
-	advanced: { disableOriginCheck: true },
 	plugins: [
 		openAPI(),
 		emailOTP({
