@@ -30,11 +30,17 @@ app.get("/openapi.json", (_, res) => {
 	res.json(openApiDoc);
 });
 
+if (env.NODE_ENV !== "production") {
+	app.use(serveStatic('public'))
+}
+
 // Serve the Scalar UI
 app.use(
 	"/api/docs",
 	apiReference({
     content: openApiDoc,
+    favicon: '/favicon.ico',
+    cdn: 'https://cdn.jsdelivr.net/npm/@scalar/api-reference',
 		// theme: 'purple', // optional: 'alternate' | 'default' | 'moon' | 'purple' | 'solarized'
 	}),
 );
@@ -65,7 +71,6 @@ const bootstrap = async () => {
 	if (env.NODE_ENV !== "production") {
 		const PORT = env.PORT ?? 8080;
     app.listen(+PORT, () => console.log(`✅ Server running on port ${PORT}`));
-    app.use(serveStatic('public'))
 	}
 };
 
