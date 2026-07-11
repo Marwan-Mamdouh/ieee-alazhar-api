@@ -1,6 +1,6 @@
 import helmet from "helmet";
 import compression from "compression";
-import express, { json, type Response, static as serveStatic } from "express";
+import express, { json, type Response } from "express";
 import { toNodeHandler } from "better-auth/node";
 import { apiReference } from "@scalar/express-api-reference";
 
@@ -30,18 +30,11 @@ app.get("/openapi.json", (_, res) => {
 	res.json(openApiDoc);
 });
 
-if (env.NODE_ENV !== "production") {
-	app.use(serveStatic('public'))
-}
-
 // Serve the Scalar UI
 app.use(
 	"/api/docs",
 	apiReference({
-    // content: openApiDoc,
-    url: '/openapi.json',
-    favicon: '/favicon.ico',
-    cdn: 'https://cdn.jsdelivr.net/npm/@scalar/api-reference',
+    content: openApiDoc,
 		// theme: 'purple', // optional: 'alternate' | 'default' | 'moon' | 'purple' | 'solarized'
 	}),
 );
