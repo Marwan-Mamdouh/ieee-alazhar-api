@@ -1,6 +1,6 @@
 import helmet from "helmet";
 import compression from "compression";
-import express, { json, type Response } from "express";
+import express, { json, type Response, static as serveStatic } from "express";
 import { toNodeHandler } from "better-auth/node";
 import { apiReference } from "@scalar/express-api-reference";
 
@@ -29,8 +29,6 @@ const openApiDoc = await generateOpenAPIDocument();
 app.get("/openapi.json", (_, res) => {
 	res.json(openApiDoc);
 });
-
-app.use(express.static('public'))
 
 // Serve the Scalar UI
 app.use(
@@ -67,7 +65,8 @@ app.use(errorHandler);
 const bootstrap = async () => {
 	if (env.NODE_ENV !== "production") {
 		const PORT = env.PORT ?? 8080;
-		app.listen(+PORT, () => console.log(`✅ Server running on port ${PORT}`));
+    app.listen(+PORT, () => console.log(`✅ Server running on port ${PORT}`));
+    app.use(serveStatic('public'))
 	}
 };
 
