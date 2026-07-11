@@ -30,11 +30,14 @@ app.get("/openapi.json", (_, res) => {
 	res.json(openApiDoc);
 });
 
+app.use(express.static('public'))
+
 // Serve the Scalar UI
 app.use(
 	"/api/docs",
 	apiReference({
-		content: openApiDoc,
+    content: openApiDoc,
+		favicon: "/favicon.ico",
 		// theme: 'purple', // optional: 'alternate' | 'default' | 'moon' | 'purple' | 'solarized'
 	}),
 );
