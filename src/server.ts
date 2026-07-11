@@ -38,7 +38,8 @@ if (env.NODE_ENV !== "production") {
 app.use(
 	"/api/docs",
 	apiReference({
-    content: openApiDoc,
+    // content: openApiDoc,
+    url: '/openapi.json',
     favicon: '/favicon.ico',
     cdn: 'https://cdn.jsdelivr.net/npm/@scalar/api-reference',
 		// theme: 'purple', // optional: 'alternate' | 'default' | 'moon' | 'purple' | 'solarized'
