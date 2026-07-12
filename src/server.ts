@@ -1,6 +1,7 @@
 import helmet from "helmet";
 import compression from "compression";
 import express, { json, type Response } from "express";
+import path from "node:path";
 import { toNodeHandler } from "better-auth/node";
 import { apiReference } from "@scalar/express-api-reference";
 
@@ -30,7 +31,8 @@ app.get("/openapi.json", (_, res) => {
   res.json(openApiDoc);
 });
 
-app.use("/favicon.ico", express.static("public/favicon.ico"));
+// Serve local static assets. On Vercel, `public/**` is served directly by the CDN.
+app.use(express.static(path.resolve("public")));
 
 // Serve the Scalar UI
 app.use(
