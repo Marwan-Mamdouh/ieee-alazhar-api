@@ -37,6 +37,7 @@ app.use(
   "/api/docs",
   apiReference({
     content: openApiDoc,
+    favicon: "/favicon.ico",
     // theme: 'purple', // optional: 'alternate' | 'default' | 'moon' | 'purple' | 'solarized'
   }),
 );
