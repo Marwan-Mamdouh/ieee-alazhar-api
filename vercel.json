@@ -3,7 +3,7 @@
   "framework": "express",
   "functions": {
     "src/server.ts": {
-      "runtime": "@vercel/node"
+      "maxDuration": "max"
     }
   },
   "routes": [
