@@ -7,7 +7,8 @@
 		"dev": "tsx watch src/server.ts",
 		"build": "tsc",
 		"typecheck": "tsc --noEmit",
-		"start": "node dist/server.js"
+		"start": "node dist/server.js",
+		"vercel:dep":"vercel deploy"
 	},
 	"dependencies": {
 		"@asteasolutions/zod-to-openapi": "^8.5.0",
@@ -35,6 +36,7 @@
 		"@types/node": "^26.1.1",
 		"@types/nodemailer": "^8.0.1",
 		"tsx": "^4.23.0",
-		"typescript": "^6.0.3"
+		"typescript": "^6.0.3",
+		"vercel": "^55.0.0"
 	}
 }

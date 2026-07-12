@@ -1,13 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "express",
-  "routes": [
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "src/server.ts"
-    }
-  ]
+  "devCommand": "npm run dev",
+  "buildCommand": "npm run build"
 }
