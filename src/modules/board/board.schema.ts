@@ -164,21 +164,20 @@ export const addBoardMemberSchema = baseBoardMemberSchema
   .openapi("addBoardMemberSchema");
 
 const CURRENT_YEAR = new Date().getFullYear();
-const MIN_YEAR = 2017;
-const MAX_YEAR = CURRENT_YEAR + 5;
+const MIN_YEAR = 2025;
+const MAX_YEAR = CURRENT_YEAR + 1;
 
 const yearField = (example: number) =>
   z
     .string()
-    .min(2)
-    .max(4)
+    .regex(/^\d{4}$/, "Year must be a 4-digit number")
     .transform(Number)
     .pipe(
       z
         .number()
         .int()
         .min(MIN_YEAR, `Year must be >= ${MIN_YEAR}`)
-        .max(MAX_YEAR, `Year cannot be more than 5 years in the future`),
+        .max(MAX_YEAR, `Year cannot be more than 1 year in the future`),
     )
     .openapi({ example });
 
