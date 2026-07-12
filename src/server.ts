@@ -27,16 +27,18 @@ const openApiDoc = await generateOpenAPIDocument();
 
 // Serve the raw JSON spec (Scalar needs a URL to fetch from)
 app.get("/openapi.json", (_, res) => {
-	res.json(openApiDoc);
+  res.json(openApiDoc);
 });
+
+app.use("/favicon.ico", express.static("public/favicon.ico"));
 
 // Serve the Scalar UI
 app.use(
-	"/api/docs",
-	apiReference({
+  "/api/docs",
+  apiReference({
     content: openApiDoc,
-		// theme: 'purple', // optional: 'alternate' | 'default' | 'moon' | 'purple' | 'solarized'
-	}),
+    // theme: 'purple', // optional: 'alternate' | 'default' | 'moon' | 'purple' | 'solarized'
+  }),
 );
 
 app.use(helmet());
@@ -56,16 +58,16 @@ app.use("/api/v1/committees", committeesRouter);
 app.use("/api/v1/events", eventsRouter);
 
 app.use((_, res: Response) => {
-	res.status(404).json({ message: "Endpoint not found." });
+  res.status(404).json({ message: "Endpoint not found." });
 });
 
 app.use(errorHandler);
 
 const bootstrap = async () => {
-	if (env.NODE_ENV !== "production") {
-		const PORT = env.PORT ?? 8080;
+  if (env.NODE_ENV !== "production") {
+    const PORT = env.PORT ?? 8080;
     app.listen(+PORT, () => console.log(`✅ Server running on port ${PORT}`));
-	}
+  }
 };
 
 bootstrap();
