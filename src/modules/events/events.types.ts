@@ -1,6 +1,4 @@
-interface SanityImage {
-	asset: { url: string };
-}
+import type { SanityImage } from '../../types/SanitySharedTypes.js';
 
 interface Speaker {
 	name: string;

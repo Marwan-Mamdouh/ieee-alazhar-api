@@ -1,13 +1,11 @@
-interface CommitteeImage {
-	asset: { url: string };
-}
+import type { SanityImage } from '../../types/SanitySharedTypes.js';
 
 export interface Committee {
 	_id: string;
 	name: string;
 	type: string;
 	description: string;
-	logo: CommitteeImage;
+	logo: SanityImage;
 }
 
 // What the endpoint returns — committees grouped by their `type` field
