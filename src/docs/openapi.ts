@@ -6,6 +6,7 @@ import "../modules/board/board.docs.js";
 import "../modules/feedback/feedback.docs.js";
 import "../modules/committees/committees.docs.js";
 import "../modules/events/events.docs.js";
+import "../modules/home/home.docs.js";
 import auth from "../util/auth.js";
 
 export const generateOpenAPIDocument = async () => {

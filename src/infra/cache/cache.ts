@@ -37,6 +37,9 @@ export const CACHE_KEYS = {
 
   // GET /events/:id
   eventById: (id: string) => `events:id:${id}`,
+
+  // GET /home
+  homeData: () => `home:data`,
 } as const;
 
 const cacheKeyPrefix = "cache:";
@@ -50,6 +53,7 @@ export const TTL = {
 	COMMITTEES_LIST: 5 * 60,   // 5 minutes
 	EVENTS_LIST: 5 * 60,        // 5 minutes
 	EVENT_BY_ID: 10 * 60,       // 10 minutes — detail pages are more stable
+	HOME_DATA: 60 * 60,         // 1 hour — homepage images change infrequently
 } as const;
 
 // ─── Core Cache Helpers ──────────────────────────────────────────────────────
