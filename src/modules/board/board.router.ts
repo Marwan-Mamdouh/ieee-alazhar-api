@@ -20,6 +20,13 @@ import { httpCache } from "../../middlewares/http.caching.js";
 import { CACHE_KEYS, TTL, getCachedData } from "../../infra/cache/cache.js";
 import appEmitter, { CACHE_EVENTS } from "../../infra/cache/cache.events.js";
 import { rateLimitMiddleware } from "../../middlewares/rateLimiting.middleware.js";
+import {
+  BOARD_TYPES,
+  GENDERS,
+  ALLOWED_POSITIONS_BY_TYPE,
+  ALLOWED_TRACKS_BY_TYPE,
+  TECHNICAL_TRACK_GROUPS,
+} from "./board.types.js";
 
 const router = Router();
 router.get(
@@ -55,6 +62,22 @@ router.get(
 
     return res.json({ data: { years: result } });
   }),
+);
+
+router.get(
+  "/meta",
+  httpCache({ strategy: "public" }), // , maxAge: 60 * 60 * 24 * 30  30 days
+  (_, res) => {
+    res.json({
+      data: {
+        memberTypes: BOARD_TYPES,
+        genders: GENDERS,
+        allowedPositionsByType: ALLOWED_POSITIONS_BY_TYPE,
+        allowedTracksByType: ALLOWED_TRACKS_BY_TYPE,
+        technicalTrackGroups: TECHNICAL_TRACK_GROUPS,
+      },
+    });
+  },
 );
 
 router.get(

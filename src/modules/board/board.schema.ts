@@ -278,13 +278,13 @@ export const boardMemberDTO = z
       .optional()
       .openapi({ example: "A passionate IEEE member." }),
     email: z.email().optional().openapi({ example: "john.doe@example.com" }),
-    image: z
-      .object({
-        url: z.url().min(2).max(1024).openapi({
-          example:
-            "https://res.cloudinary.com/ieee-vm/image/upload/v1692200000/sample.jpg",
-        }),
-        public_id: z.string().min(2).max(100),
+    image_url: z
+      .url()
+      .min(2)
+      .max(1024)
+      .openapi({
+        example:
+          "https://res.cloudinary.com/ieee-vm/image/upload/v1692200000/sample.jpg",
       })
       .optional(),
     linkedin_url,
