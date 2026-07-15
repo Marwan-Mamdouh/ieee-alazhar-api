@@ -7,6 +7,7 @@ import {
   addBoardMemberSchema,
   updateBoardMemberSchema,
 } from "./board.schema.js";
+import { BOARD_TYPES, GENDERS } from "./board.types.js";
 
 registry.registerPath({
   method: "get",
@@ -19,7 +20,19 @@ registry.registerPath({
       description: "Successful response with board members",
       content: {
         "application/json": {
-          schema: z.array(boardMemberDTO),
+          schema: z.object({
+            data: z.object({
+              officer: z.array(boardMemberDTO),
+              technical: z.object({
+                "cs-fundamentals": z.array(boardMemberDTO),
+                "software-development": z.array(boardMemberDTO),
+                "systems-and-data": z.array(boardMemberDTO),
+                engineering: z.array(boardMemberDTO),
+              }),
+              branding: z.array(boardMemberDTO),
+              operation: z.array(boardMemberDTO),
+            }),
+          }),
         },
       },
     },
@@ -63,6 +76,33 @@ registry.registerPath({
       content: {
         "application/json": {
           schema: z.array(z.number()),
+        },
+      },
+    },
+    500: { description: "Internal server error" },
+  },
+});
+
+registry.registerPath({
+  method: "get",
+  path: "/api/v1/board/meta",
+  tags: ["Board"],
+  summary: "Get board configuration metadata for admin form rendering",
+  responses: {
+    200: {
+      description:
+        "Static configuration constants — memberTypes, positions, tracks, and track groups",
+      content: {
+        "application/json": {
+          schema: z.object({
+            data: z.object({
+              memberTypes: z.array(z.enum(BOARD_TYPES)),
+              genders: z.array(z.enum(GENDERS)),
+              allowedPositionsByType: z.record(z.string(), z.array(z.string())),
+              allowedTracksByType: z.record(z.string(), z.array(z.string())),
+              technicalTrackGroups: z.record(z.string(), z.array(z.string())),
+            }),
+          }),
         },
       },
     },

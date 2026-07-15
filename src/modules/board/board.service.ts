@@ -2,9 +2,11 @@ import {
   boardMembersProps,
   OFFICER_POSITIONS,
   BOARD_TYPES,
+  TECHNICAL_TRACK_GROUPS,
   type BoardMember,
   type MemberType,
   type OfficerPosition,
+  type TechnicalTrackGroup,
 } from "./board.types.js";
 import Board from "./board.model.js";
 import type {
@@ -15,6 +17,14 @@ import type {
 import UploadService from "../upload/upload.service.js";
 import { AppError, NotFoundError } from "../../errors/app.error.js";
 import { toMemberDTO } from "./board.dto.js";
+
+type TechnicalGroupResult = Record<TechnicalTrackGroup, BoardMember[]>;
+
+type BoardResult = {
+  [K in MemberType]: K extends "technical"
+    ? TechnicalGroupResult
+    : BoardMember[];
+};
 
 const boardService = {
   getBoard: async (data: GetBoard) => {
@@ -47,18 +57,30 @@ const boardService = {
       })
       .exec();
 
-    const initialOutput: Record<MemberType, BoardMember[]> = {
+    const initialOutput: BoardResult = {
       officer: [],
-      technical: [],
+      technical: {
+        "cs-fundamentals": [],
+        "software-development": [],
+        "systems-and-data": [],
+        engineering: [],
+      },
       branding: [],
       operation: [],
     };
 
     const unsortedResult = groupedMembers.reduce((acc, currentGroup) => {
-      acc[currentGroup._id] = sortMembers(
-        currentGroup._id,
-        currentGroup.members.map(toMemberDTO),
-      );
+      const memberType = currentGroup._id as MemberType;
+      const members: BoardMember[] = currentGroup.members.map(toMemberDTO);
+
+      if (memberType === "technical") {
+        acc.technical = groupTechnicalMembers(members);
+      } else {
+        (acc as Record<string, BoardMember[]>)[memberType] = sortMembers(
+          memberType,
+          members,
+        );
+      }
       return acc;
     }, initialOutput);
     // Sort the groups themselves: officer → technical → branding → operation
@@ -221,6 +243,38 @@ const sortMembers = (
     if (b.position === "head") return 1;
     return 0;
   });
+};
+
+const groupTechnicalMembers = (
+  members: BoardMember[],
+): TechnicalGroupResult => {
+  const result: TechnicalGroupResult = {
+    "cs-fundamentals": [],
+    "software-development": [],
+    "systems-and-data": [],
+    engineering: [],
+  };
+
+  for (const member of members) {
+    const track = member.track;
+    if (!track) continue;
+
+    for (const [groupName, tracks] of Object.entries(
+      TECHNICAL_TRACK_GROUPS,
+    ) as [TechnicalTrackGroup, readonly string[]][]) {
+      if ((tracks as readonly string[]).includes(track)) {
+        result[groupName].push(member);
+        break;
+      }
+    }
+  }
+
+  // Sort within each group: track A→Z, head before vice within same track
+  for (const groupName of Object.keys(result) as TechnicalTrackGroup[]) {
+    result[groupName] = sortMembers("technical", result[groupName]);
+  }
+
+  return result;
 };
 
 export default boardService;

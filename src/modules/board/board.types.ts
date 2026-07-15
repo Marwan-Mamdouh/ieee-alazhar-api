@@ -27,7 +27,7 @@ export const TECHNICAL_TRACKS = [
   "advanced programming",
   "ai",
   "back end",
-  "c",
+  "c language",
   "cloud & devops",
   "cyber security",
   "data science",
@@ -41,6 +41,7 @@ export const TECHNICAL_TRACKS = [
   "python",
   "robotics",
   "scientific research",
+  "software testing",
   "ui/ux",
 ] as const;
 
@@ -81,6 +82,44 @@ export const ALLOWED_TRACKS_BY_TYPE: Partial<
   branding: BRANDING_TRACKS,
   operation: OPERATION_TRACKS,
 };
+
+export const TECHNICAL_TRACK_GROUPS = {
+  "cs-fundamentals": [
+    "c language",
+    "python",
+    "java",
+    "problem solving",
+    "advanced programming",
+  ],
+  "software-development": ["front end", "back end", "ui/ux", "flutter"],
+  "systems-and-data": [
+    "ai",
+    "data science",
+    "cloud & devops",
+    "software testing",
+    "cyber security",
+    "network",
+  ],
+  engineering: [
+    "embedded systems",
+    "robotics",
+    "power distribution",
+    "scientific research",
+  ],
+} as const;
+
+export type TechnicalTrackGroup = keyof typeof TECHNICAL_TRACK_GROUPS;
+
+type _AllGroupedTracks =
+  (typeof TECHNICAL_TRACK_GROUPS)[TechnicalTrackGroup][number];
+
+type _AssertAllTracksGrouped =
+  Exclude<(typeof TECHNICAL_TRACKS)[number], _AllGroupedTracks> extends never
+    ? true
+    : never;
+
+// Compile error if any technical track is missing from TECHNICAL_TRACK_GROUPS
+const _exhaustiveTrackCheck: _AssertAllTracksGrouped = true;
 
 export const boardMembersProps =
   "_id name email bio gender memberType boardYear position track avatar linkedin_url" as const;
