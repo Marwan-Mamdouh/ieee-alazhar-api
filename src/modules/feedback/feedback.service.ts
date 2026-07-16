@@ -2,11 +2,16 @@ import type {
   CreateFeedbackDTO,
   UpdateFeedbackStatusDTO,
 } from "./feedback.schema.js";
-import { type FeedbackItem, feedbackProps } from "./feedback.types.js";
+import {
+  type FeedbackItem,
+  type FeedbackResult,
+  feedbackProps,
+} from "./feedback.types.js";
 import FeedbackModel from "./feedback.model.js";
 import { toFeedbackDTO } from "./feedback.dto.js";
 import { NotFoundError } from "../../errors/app.error.js";
 import type { PaginationParams } from "../../util/zod.config.js";
+import type { PaginatedResponse } from "../../types/PaginatedResponse.js";
 
 const feedbackService = {
   async createFeedback(feedback: CreateFeedbackDTO) {
@@ -32,7 +37,9 @@ const feedbackService = {
     return toFeedbackDTO(feedback);
   },
 
-  async getFeedbacks(validatedQuery: PaginationParams) {
+  async getFeedbacks(
+    validatedQuery: PaginationParams,
+  ): Promise<PaginatedResponse<FeedbackResult>> {
     const { page, limit } = validatedQuery;
 
     const query = FeedbackModel.find()
