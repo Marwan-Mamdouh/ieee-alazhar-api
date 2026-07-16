@@ -25,8 +25,8 @@ import {
   GENDERS,
   ALLOWED_POSITIONS_BY_TYPE,
   ALLOWED_TRACKS_BY_TYPE,
-  TECHNICAL_TRACK_GROUPS,
 } from "./board.types.js";
+import { TECHNICAL_TRACK_GROUPS } from "../../types/shared.types.js";
 
 const router = Router();
 router.get(
