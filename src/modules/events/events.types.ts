@@ -16,7 +16,9 @@ export interface SanityEventSummary {
 	title: string;
 	slug: { current: string };
 	startDate: string;
-	endDate: string;
+  endDate: string;
+  startDateSecondV?: string;
+  endDateSecondV?: string;
 	location?: string;
 	subtitle?: string;
 	registrationLink?: string;
