@@ -2,12 +2,15 @@ import {
   boardMembersProps,
   OFFICER_POSITIONS,
   BOARD_TYPES,
-  TECHNICAL_TRACK_GROUPS,
   type BoardMember,
   type MemberType,
   type OfficerPosition,
-  type TechnicalTrackGroup,
 } from "./board.types.js";
+import {
+  TECHNICAL_TRACK_GROUPS,
+  type TechnicalTrackGroup,
+} from "../../types/shared.types.js";
+
 import Board from "./board.model.js";
 import type {
   AddBoardMember,
