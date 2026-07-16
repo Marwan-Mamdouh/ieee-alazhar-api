@@ -8,16 +8,29 @@ const committeeImageSchema = z.object({
 
 const committeeSchema = z
   .object({
-    _id: z.string().openapi({ example: "drafts.committee-123" }),
-    name: z.string().openapi({ example: "Web Development" }),
-    type: z.string().openapi({ example: "technical" }),
-    description: z
+    _id: z
       .string()
-      .openapi({ example: "Responsible for building Web projects." }),
+      .openapi({ example: "3a8b8046-78cf-4a4c-87d1-efc03b825ca0" }),
+    name: z.string().openapi({ example: "Back End" }),
+    type: z.string().openapi({ example: "technical" }),
+    description: z.string().openapi({
+      example: "Responsible for building back end systems.",
+    }),
     logo: committeeImageSchema,
   })
   .openapi("Committee");
 
+const technicalGroupedSchema = z.object({
+  "cs-fundamentals": z.array(committeeSchema),
+  "software-development": z.array(committeeSchema),
+  "systems-and-data": z.array(committeeSchema),
+  engineering: z.array(committeeSchema),
+});
+
 export const groupedCommitteesSchema = z
-  .record(z.string(), z.array(committeeSchema))
+  .object({
+    technical: technicalGroupedSchema,
+    branding: z.array(committeeSchema),
+    operation: z.array(committeeSchema),
+  })
   .openapi("GroupedCommittees");
