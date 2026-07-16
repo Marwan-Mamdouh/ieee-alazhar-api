@@ -1,12 +1,24 @@
-import type { SanityImage } from '../../types/SanitySharedTypes.js';
+import type { SanityImage } from "../../types/SanitySharedTypes.js";
+import type { MemberType } from "../board/board.types.js";
+import type { TechnicalTrackGroup } from "../../types/shared.types.js";
+
+export type CommitteeMemberType = Exclude<MemberType, "officer">;
 
 export interface Committee {
-	_id: string;
-	name: string;
-	type: string;
-	description: string;
-	logo: SanityImage;
+  _id: string;
+  name: string;
+  type: string;
+  description: string;
+  logo: SanityImage;
 }
 
-// What the endpoint returns — committees grouped by their `type` field
-export type GroupedCommittees = Record<string, Committee[]>;
+export type TechnicalGroupedCommittees = Record<
+  TechnicalTrackGroup,
+  Committee[]
+>;
+
+export type GroupedCommittees = {
+  technical: TechnicalGroupedCommittees;
+  branding: Committee[];
+  operation: Committee[];
+};

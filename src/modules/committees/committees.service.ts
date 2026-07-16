@@ -1,19 +1,64 @@
 import { sanityClient } from "../../config/sanity.js";
-import type { Committee, GroupedCommittees } from "./committees.types.js";
+import {
+  TECHNICAL_TRACK_GROUPS,
+  type TechnicalTrackGroup,
+} from "../../types/shared.types.js";
+import type {
+  Committee,
+  CommitteeMemberType,
+  GroupedCommittees,
+  TechnicalGroupedCommittees,
+} from "./committees.types.js";
 
 const committeesService = {
-	getCommittees: async (): Promise<GroupedCommittees> => {
-		const query = `*[_type == "committee"] {
+  getCommittees: async (): Promise<GroupedCommittees> => {
+    const query = `*[_type == "committee"] {
       _id, name, type, description, logo { asset -> { url } }
     }`;
 
-		const result: Committee[] = await sanityClient.fetch(query);
+    const result: Committee[] = await sanityClient.fetch(query);
 
-		return result.reduce((acc, committee) => {
-			(acc[committee.type] ??= []).push(committee);
-			return acc;
-		}, {} as GroupedCommittees);
-	},
+    const initial: GroupedCommittees = {
+      technical: {
+        "cs-fundamentals": [],
+        "software-development": [],
+        "systems-and-data": [],
+        engineering: [],
+      },
+      branding: [],
+      operation: [],
+    };
+
+    return result.reduce((acc, committee) => {
+      const type = committee.type as CommitteeMemberType;
+
+      if (type === "technical") {
+        groupTechnicalCommittee(acc.technical, committee);
+      } else {
+        (acc[type] as Committee[]).push(committee);
+      }
+
+      return acc;
+    }, initial);
+  },
+};
+
+const groupTechnicalCommittee = (
+  groups: TechnicalGroupedCommittees,
+  committee: Committee,
+): void => {
+  const normalizedName = committee.name.toLowerCase().trim();
+
+  for (const [groupName, tracks] of Object.entries(TECHNICAL_TRACK_GROUPS) as [
+    TechnicalTrackGroup,
+    readonly string[],
+  ][]) {
+    if ((tracks as readonly string[]).includes(normalizedName)) {
+      groups[groupName].push(committee);
+      return;
+    }
+  }
+  // No match — committee is waiting for admin data, silently skipped
 };
 
 export default committeesService;
