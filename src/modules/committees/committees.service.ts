@@ -29,7 +29,7 @@ const committeesService = {
       operation: [],
     };
 
-    return result.reduce((acc, committee) => {
+    const grouped = result.reduce((acc, committee) => {
       const type = committee.type as CommitteeMemberType;
 
       if (type === "technical") {
@@ -40,8 +40,23 @@ const committeesService = {
 
       return acc;
     }, initial);
+
+    // Sort each group alphabetically by name
+    grouped.branding = sortAlphabetically(grouped.branding);
+    grouped.operation = sortAlphabetically(grouped.operation);
+
+    for (const key of Object.keys(grouped.technical) as TechnicalTrackGroup[]) {
+      grouped.technical[key] = sortAlphabetically(grouped.technical[key]);
+    }
+
+    return grouped;
   },
 };
+
+const sortAlphabetically = (committees: Committee[]): Committee[] =>
+  [...committees].sort((a, b) =>
+    a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+  );
 
 const groupTechnicalCommittee = (
   groups: TechnicalGroupedCommittees,
