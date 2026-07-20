@@ -12,6 +12,7 @@
 	"dependencies": {
 		"@asteasolutions/zod-to-openapi": "^8.5.0",
 		"@sanity/client": "^7.23.0",
+		"@sanity/webhook": "^4.0.4",
 		"@scalar/express-api-reference": "^0.9.16",
 		"@upstash/ratelimit": "^2.0.8",
 		"@upstash/redis": "^1.38.0",
