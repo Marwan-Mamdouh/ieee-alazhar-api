@@ -6,24 +6,24 @@ import type { GetBoard } from "../../modules/board/board.schema.js";
 // If you ever rename a key pattern, you change it here — nowhere else.
 
 export const CACHE_KEYS = {
-	boardList: (params: GetBoard) => {
-		const {
-			yearFrom,
-			yearTo,
-			position = "all",
-			memberType = "all",
-			track = "all",
-		} = params;
-		return `boards:list:${yearFrom}-${yearTo}:pos=${position}:type=${memberType}:track=${track}`;
-	},
+  boardList: (params: GetBoard) => {
+    const {
+      yearFrom,
+      yearTo,
+      position = "all",
+      memberType = "all",
+      track = "all",
+    } = params;
+    return `boards:list:${yearFrom}-${yearTo}:pos=${position}:type=${memberType}:track=${track}`;
+  },
 
-	// GET /boards/:boardId
-	boardById: (boardId: string) => `boards:id:${boardId}`,
+  // GET /boards/:boardId
+  boardById: (boardId: string) => `boards:id:${boardId}`,
 
-	// Wildcard pattern for invalidating ALL caches related to a board
-	boardPattern: (boardId: string) => `boards:*${boardId}*`,
+  // Wildcard pattern for invalidating ALL caches related to a board
+  boardPattern: (boardId: string) => `boards:*${boardId}*`,
 
-	// Wildcard for the entire boards list cache (e.g. when a member is added)
+  // Wildcard for the entire boards list cache (e.g. when a member is added)
   boardListPattern: () => `boards:list:*`,
 
   // boardYears
@@ -31,76 +31,79 @@ export const CACHE_KEYS = {
 
   // GET /committees
   committeesList: () => `committees:list`,
+  committeesPattern: () => `committees:*`,
 
   // GET /events
   eventsList: () => `events:list`,
+  eventsPattern: () => `events:*`,
 
   // GET /events/:id
   eventById: (id: string) => `events:id:${id}`,
 
   // GET /home
   homeData: () => `home:data`,
+  homePattern: () => `home:*`,
 } as const;
 
 const cacheKeyPrefix = "cache:";
 
 // ─── TTL Constants ───────────────────────────────────────────────────────────
 export const TTL = {
-	BOARDS_LIST: 60 * 60 * 12, // 12 hours — filtered lists change more often
-	BOARD_BY_ID: 60 * 60 * 24, // 1 day — single board, more stable
-	BOARD_YEARS: 60 * 60 * 24, // 1 day — stable, changes infrequently
-	// Sanity read-only proxies — no invalidation, short TTL by design
-	COMMITTEES_LIST: 5 * 60,   // 5 minutes
-	EVENTS_LIST: 5 * 60,        // 5 minutes
-	EVENT_BY_ID: 10 * 60,       // 10 minutes — detail pages are more stable
-	HOME_DATA: 60 * 60,         // 1 hour — homepage images change infrequently
+  BOARDS_LIST: 60 * 60 * 12, // 12 hours — filtered lists change more often
+  BOARD_BY_ID: 60 * 60 * 24, // 1 day — single board, more stable
+  BOARD_YEARS: 60 * 60 * 24, // 1 day — stable, changes infrequently
+  // Sanity read-only proxies — no invalidation, short TTL by design
+  COMMITTEES_LIST: 60 * 60 * 24, // webhook handles invalidation now
+  EVENTS_LIST: 60 * 60 * 24, // webhook handles invalidation now
+  EVENT_BY_ID: 60 * 60 * 24, // webhook handles invalidation now
+  HOME_DATA: 60 * 60 * 24, // webhook handles invalidation now
 } as const;
 
 // ─── Core Cache Helpers ──────────────────────────────────────────────────────
 
 export const getCachedData = async <T>(
-	cacheKey: string,
-	fetchFn: () => Promise<T>,
-	ttl: number,
+  cacheKey: string,
+  fetchFn: () => Promise<T>,
+  ttl: number,
 ): Promise<T> => {
-	// Step 1: Try cache
-	try {
-		const cached = await redis.get<T>(cacheKey);
-		if (cached !== null) {
-			console.log(`[Cache] HIT → ${cacheKey}`);
-			return cached;
-		}
-	} catch (err) {
-		// Redis is down or unreachable — degrade gracefully, do NOT crash
-		console.error(`[Cache] Read error for "${cacheKey}":`, err);
-	}
+  // Step 1: Try cache
+  try {
+    const cached = await redis.get<T>(cacheKey);
+    if (cached !== null) {
+      console.log(`[Cache] HIT → ${cacheKey}`);
+      return cached;
+    }
+  } catch (err) {
+    // Redis is down or unreachable — degrade gracefully, do NOT crash
+    console.error(`[Cache] Read error for "${cacheKey}":`, err);
+  }
 
-	// Step 2: Cache miss — fetch from source
-	console.log(`[Cache] MISS → ${cacheKey}`);
-	const data = await fetchFn();
+  // Step 2: Cache miss — fetch from source
+  console.log(`[Cache] MISS → ${cacheKey}`);
+  const data = await fetchFn();
 
-	// Step 3: Write to cache — failure here is non-fatal
-	try {
-		await redis.setex(cacheKey, ttl, data);
-		console.log(`[Cache] Stored "${cacheKey}" for ${ttl}s`);
-	} catch (err) {
-		console.error(`[Cache] Write error for "${cacheKey}":`, err);
-	}
+  // Step 3: Write to cache — failure here is non-fatal
+  try {
+    await redis.setex(cacheKey, ttl, data);
+    console.log(`[Cache] Stored "${cacheKey}" for ${ttl}s`);
+  } catch (err) {
+    console.error(`[Cache] Write error for "${cacheKey}":`, err);
+  }
 
-	return data;
+  return data;
 };
 
 export const invalidateByPattern = async (pattern: string): Promise<void> => {
-	try {
-		const keys = await redis.keys(pattern);
-		if (keys.length === 0) return;
+  try {
+    const keys = await redis.keys(pattern);
+    if (keys.length === 0) return;
 
-		await redis.del(...keys);
-		console.log(
-			`[Cache] Invalidated ${keys.length} key(s) matching "${pattern}"`,
-		);
-	} catch (err) {
-		// Log but never throw — a failed invalidation should not roll back a write
-		console.error(`[Cache] Invalidation error for pattern "${pattern}":`, err);
-	}
+    await redis.del(...keys);
+    console.log(
+      `[Cache] Invalidated ${keys.length} key(s) matching "${pattern}"`,
+    );
+  } catch (err) {
+    // Log but never throw — a failed invalidation should not roll back a write
+    console.error(`[Cache] Invalidation error for pattern "${pattern}":`, err);
+  }
 };

@@ -11,32 +11,44 @@ import { invalidateByPattern, CACHE_KEYS } from "./cache.js";
  * This file is the bridge — and it owns that responsibility explicitly.
  */
 export const registerCacheListeners = (): void => {
-	// Board updated or deleted → invalidate that board's cache
-	// AND invalidate the list cache (list may show stale member counts, names, etc.)
-	appEmitter.onEvent(CACHE_EVENTS.BOARD_UPDATED, async ({ boardId }) => {
-		await invalidateByPattern(CACHE_KEYS.boardPattern(boardId));
-		await invalidateByPattern(CACHE_KEYS.boardListPattern());
-	});
+  // Board updated or deleted → invalidate that board's cache
+  // AND invalidate the list cache (list may show stale member counts, names, etc.)
+  appEmitter.onEvent(CACHE_EVENTS.BOARD_UPDATED, async ({ boardId }) => {
+    await invalidateByPattern(CACHE_KEYS.boardPattern(boardId));
+    await invalidateByPattern(CACHE_KEYS.boardListPattern());
+  });
 
-	appEmitter.onEvent(CACHE_EVENTS.BOARD_DELETED, async ({ boardId }) => {
-		await invalidateByPattern(CACHE_KEYS.boardPattern(boardId));
-		await invalidateByPattern(CACHE_KEYS.boardListPattern());
-	});
+  appEmitter.onEvent(CACHE_EVENTS.BOARD_DELETED, async ({ boardId }) => {
+    await invalidateByPattern(CACHE_KEYS.boardPattern(boardId));
+    await invalidateByPattern(CACHE_KEYS.boardListPattern());
+  });
 
-	// Avatar changes only affect the board itself, not the list
-	appEmitter.onEvent(CACHE_EVENTS.BOARD_AVATAR_UPDATED, async ({ boardId }) => {
-		await invalidateByPattern(CACHE_KEYS.boardPattern(boardId));
-	});
+  // Avatar changes only affect the board itself, not the list
+  appEmitter.onEvent(CACHE_EVENTS.BOARD_AVATAR_UPDATED, async ({ boardId }) => {
+    await invalidateByPattern(CACHE_KEYS.boardPattern(boardId));
+  });
 
-	appEmitter.onEvent(CACHE_EVENTS.BOARD_AVATAR_DELETED, async ({ boardId }) => {
-		await invalidateByPattern(CACHE_KEYS.boardPattern(boardId));
-	});
+  appEmitter.onEvent(CACHE_EVENTS.BOARD_AVATAR_DELETED, async ({ boardId }) => {
+    await invalidateByPattern(CACHE_KEYS.boardPattern(boardId));
+  });
 
-	// Adding a member changes the list (member count, membership data)
-	appEmitter.onEvent(CACHE_EVENTS.BOARD_MEMBER_ADDED, async ({ boardId }) => {
-		await invalidateByPattern(CACHE_KEYS.boardPattern(boardId));
-		await invalidateByPattern(CACHE_KEYS.boardListPattern());
-	});
+  // Adding a member changes the list (member count, membership data)
+  appEmitter.onEvent(CACHE_EVENTS.BOARD_MEMBER_ADDED, async ({ boardId }) => {
+    await invalidateByPattern(CACHE_KEYS.boardPattern(boardId));
+    await invalidateByPattern(CACHE_KEYS.boardListPattern());
+  });
 
-	console.log("[Cache] Listeners registered");
+  appEmitter.onEvent(CACHE_EVENTS.SANITY_COMMITTEES_UPDATED, async () => {
+    await invalidateByPattern(CACHE_KEYS.committeesPattern());
+  });
+
+  appEmitter.onEvent(CACHE_EVENTS.SANITY_EVENTS_UPDATED, async () => {
+    await invalidateByPattern(CACHE_KEYS.eventsPattern());
+  });
+
+  appEmitter.onEvent(CACHE_EVENTS.SANITY_HOME_UPDATED, async () => {
+    await invalidateByPattern(CACHE_KEYS.homePattern());
+  });
+
+  console.log("[Cache] Listeners registered");
 };

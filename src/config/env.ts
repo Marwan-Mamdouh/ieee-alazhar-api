@@ -22,6 +22,7 @@ const envSchema = z.object({
   SANITY_PROJECT_ID: z.string(),
   SANITY_DATASET: z.string(),
   SANITY_USE_CDN: z.coerce.boolean().default(false),
+  SANITY_WEBHOOK_SECRET: z.string(),
 });
 
 const env = envSchema.safeParse(process.env);
