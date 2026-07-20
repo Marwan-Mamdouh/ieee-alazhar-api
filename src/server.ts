@@ -17,6 +17,7 @@ import auth from "./util/auth.js";
 import { generateOpenAPIDocument } from "./docs/openapi.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import { registerCacheListeners } from "./infra/cache/cache.listeners.js";
+import sanityWebhookRouter from "./modules/webhooks/sanity.webhook.router.js";
 
 const app = express();
 
@@ -28,16 +29,16 @@ const openApiDoc = await generateOpenAPIDocument();
 
 // Serve the raw JSON spec (Scalar needs a URL to fetch from)
 app.get("/openapi.json", (_, res) => {
-	res.json(openApiDoc);
+  res.json(openApiDoc);
 });
 
 // Serve the Scalar UI
 app.use(
-	"/api/docs",
-	apiReference({
-		content: openApiDoc,
-		// theme: 'purple', // optional: 'alternate' | 'default' | 'moon' | 'purple' | 'solarized'
-	}),
+  "/api/docs",
+  apiReference({
+    content: openApiDoc,
+    // theme: 'purple', // optional: 'alternate' | 'default' | 'moon' | 'purple' | 'solarized'
+  }),
 );
 
 app.use(helmet());
@@ -45,6 +46,8 @@ app.use(compression());
 app.use(corsMiddleware);
 
 app.all("/api/auth/{*any}", toNodeHandler(auth));
+app.use("/api/v1/webhooks/sanity", sanityWebhookRouter);
+
 app.use(json({ type: "application/json" }));
 
 registerCacheListeners();
@@ -57,18 +60,17 @@ app.use("/api/v1/committees", committeesRouter);
 app.use("/api/v1/events", eventsRouter);
 app.use("/api/v1/home", homeRouter);
 
-
 app.use((_, res: Response) => {
-	res.status(404).json({ message: "Endpoint not found." });
+  res.status(404).json({ message: "Endpoint not found." });
 });
 
 app.use(errorHandler);
 
 const bootstrap = async () => {
-	if (env.NODE_ENV !== "production") {
-		const PORT = env.PORT ?? 8080;
-		app.listen(+PORT, () => console.log(`✅ Server running on port ${PORT}`));
-	}
+  if (env.NODE_ENV !== "production") {
+    const PORT = env.PORT ?? 8080;
+    app.listen(+PORT, () => console.log(`✅ Server running on port ${PORT}`));
+  }
 };
 
 bootstrap();
