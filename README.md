@@ -1,6 +1,6 @@
 # IEEE Al-Azhar Board API 🚀
 
-## A type-safe REST API built with TypeScript, Express, and MongoDB, powering the IEEE Al-Azhar Student Branch website in production — managing board member data, feedback intake, and events/committees content synced from Sanity CMS.
+### A type-safe REST API built with TypeScript, Express, and MongoDB, powering the IEEE Al-Azhar Student Branch website in production — managing board member data, feedback intake, and events/committees content synced from Sanity CMS.
 
 ---
 
