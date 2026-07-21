@@ -21,7 +21,10 @@ import { verifyImageBytes } from "../../middlewares/verifyImageBytes.js";
 import { httpCache } from "../../middlewares/http.caching.js";
 import { CACHE_KEYS, TTL, getCachedData } from "../../infra/cache/cache.js";
 import appEmitter, { CACHE_EVENTS } from "../../infra/cache/cache.events.js";
-import { rateLimitMiddleware } from "../../middlewares/rateLimiting.middleware.js";
+import {
+  uploadRateLimitMiddleware,
+  generalRateLimitMiddleware,
+} from "../../middlewares/rateLimiting.middleware.js";
 import {
   BOARD_TYPES,
   GENDERS,
@@ -35,6 +38,7 @@ router.get(
   "/",
   validate(getBoardSchema, "query"),
   httpCache({ strategy: "public" }),
+  generalRateLimitMiddleware,
   asyncHandler(
     async (req: TypedRequest<unknown, unknown, GetBoard>, res: Response) => {
       const cacheKey = CACHE_KEYS.boardList(req.validatedQuery!);
@@ -86,6 +90,7 @@ router.get(
   "/:boardId",
   httpCache({ strategy: "public" }),
   validate(boardIdSchema, "params"),
+  generalRateLimitMiddleware,
   asyncHandler(async (req: TypedRequest<unknown, BoardId>, res: Response) => {
     const { boardId } = req.validatedParams!;
     const cacheKey = CACHE_KEYS.boardById(boardId);
@@ -103,7 +108,7 @@ router.post(
   "/",
   isAuthenticated,
   isAdmin,
-  rateLimitMiddleware,
+  uploadRateLimitMiddleware,
   upload.single("avatar"),
   verifyImageBytes,
   validate(addBoardMemberSchema),
@@ -122,6 +127,7 @@ router.patch(
   "/:boardId",
   isAuthenticated,
   isAdmin,
+  uploadRateLimitMiddleware,
   upload.single("avatar"),
   verifyImageBytes,
   validate(boardIdSchema, "params"),
@@ -144,6 +150,7 @@ router.delete(
   "/:boardId",
   isAuthenticated,
   isAdmin,
+  generalRateLimitMiddleware,
   validate(boardIdSchema, "params"),
   asyncHandler(async (req: TypedRequest<unknown, BoardId>, res: Response) => {
     const { boardId } = req.validatedParams!;
@@ -157,7 +164,7 @@ router.patch(
   "/:boardId/avatar",
   isAuthenticated,
   isAdmin,
-  rateLimitMiddleware,
+  uploadRateLimitMiddleware,
   upload.single("avatar"),
   verifyImageBytes,
   validate(boardIdSchema, "params"),
@@ -176,6 +183,7 @@ router.delete(
   "/:boardId/avatar",
   isAuthenticated,
   isAdmin,
+  generalRateLimitMiddleware,
   validate(boardIdSchema, "params"),
   asyncHandler(async (req: TypedRequest<unknown, BoardId>, res: Response) => {
     const { boardId } = req.validatedParams!;

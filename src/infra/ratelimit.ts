@@ -1,11 +1,15 @@
 import { Ratelimit } from "@upstash/ratelimit";
 import redis from "../config/redis.js";
-// Create a new ratelimiter, that allows 10 requests per 10 seconds
-const ratelimit = new Ratelimit({
-	redis,
-	limiter: Ratelimit.slidingWindow(10, "60 s"),
-	analytics: true,
-	prefix: "@upstash/ratelimit",
+
+export const generalLimiter = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(60, "60 s"), // 60 req/min
+  prefix: "@upstash/ratelimit:general",
 });
 
-export default ratelimit;
+// src/infra/ratelimit.ts — your existing one, rename for clarity
+export const uploadLimiter = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(10, "60 s"), // 10 req/min
+  prefix: "@upstash/ratelimit:upload",
+});
