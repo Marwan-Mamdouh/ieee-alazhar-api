@@ -25,7 +25,16 @@ const sanitizeBody = (body: any) => {
   if (!body) return undefined;
 
   const clone = { ...body };
-  const sensitiveKeys = ["password", "token", "accessToken"];
+  const sensitiveKeys = [
+    "password",
+    "token",
+    "accessToken",
+    "refreshToken",
+    "otp",
+    "code",
+    "phoneNumber",
+    "phone",
+  ];
 
   sensitiveKeys.forEach((key) => {
     if (key in clone) clone[key] = "***";
