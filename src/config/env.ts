@@ -21,6 +21,8 @@ const envSchema = z.object({
     .default("development"),
   MAIL_USER: z.string().optional(),
   MAIL_APP_PASSWORD: z.string().optional(),
+  UPSTASH_REDIS_REST_URL: z.url(),
+  UPSTASH_REDIS_REST_TOKEN: z.string().min(1),
   SANITY_PROJECT_ID: z.string(),
   SANITY_DATASET: z.string(),
   SANITY_USE_CDN: z.coerce.boolean().default(false),
