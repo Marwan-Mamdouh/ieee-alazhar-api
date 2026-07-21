@@ -19,6 +19,27 @@ import { errorHandler } from "./middlewares/errorHandler.js";
 import { registerCacheListeners } from "./infra/cache/cache.listeners.js";
 import sanityWebhookRouter from "./modules/webhooks/sanity.webhook.router.js";
 
+process.on("uncaughtException", (err: Error) => {
+  console.error(
+    JSON.stringify({
+      event: "process.uncaughtException",
+      message: err.message,
+      stack: err.stack,
+    }),
+  );
+  process.exit(1);
+});
+
+process.on("unhandledRejection", (reason: unknown) => {
+  console.error(
+    JSON.stringify({
+      event: "process.unhandledRejection",
+      reason: `${reason}`,
+    }),
+  );
+  process.exit(1);
+});
+
 const app = express();
 
 await connectDb();
