@@ -17,6 +17,7 @@ import boardService from "./board.service.js";
 import { isAuthenticated } from "../../middlewares/isAuthenticated.js";
 import { isAdmin } from "../../middlewares/isAdmin.js";
 import upload from "../../middlewares/upload.js";
+import { verifyImageBytes } from "../../middlewares/verifyImageBytes.js";
 import { httpCache } from "../../middlewares/http.caching.js";
 import { CACHE_KEYS, TTL, getCachedData } from "../../infra/cache/cache.js";
 import appEmitter, { CACHE_EVENTS } from "../../infra/cache/cache.events.js";
@@ -104,6 +105,7 @@ router.post(
   isAdmin,
   rateLimitMiddleware,
   upload.single("avatar"),
+  verifyImageBytes,
   validate(addBoardMemberSchema),
   asyncHandler(async (req: TypedRequest<AddBoardMember>, res: Response) => {
     const result = await boardService.addMember(req.validatedBody!, req.file);
@@ -121,6 +123,7 @@ router.patch(
   isAuthenticated,
   isAdmin,
   upload.single("avatar"),
+  verifyImageBytes,
   validate(boardIdSchema, "params"),
   validate(updateBoardMemberSchema, "body"),
   asyncHandler(
@@ -156,6 +159,7 @@ router.patch(
   isAuthenticated,
   isAdmin,
   upload.single("avatar"),
+  verifyImageBytes,
   validate(boardIdSchema, "params"),
   asyncHandler(async (req: TypedRequest<unknown, BoardId>, res: Response) => {
     const { boardId } = req.validatedParams!;
