@@ -23,27 +23,18 @@ const app = express();
 
 await connectDb();
 
+app.use(helmet());
+app.use(corsMiddleware);
 app.use(logger);
+app.use(compression());
 // Generate once at startup and cache it — don't regenerate on every request
 const openApiDoc = await generateOpenAPIDocument();
 
 // Serve the raw JSON spec (Scalar needs a URL to fetch from)
-app.get("/openapi.json", (_, res) => {
-  res.json(openApiDoc);
-});
+app.get("/openapi.json", (_, res) => res.json(openApiDoc));
 
 // Serve the Scalar UI
-app.use(
-  "/api/docs",
-  apiReference({
-    content: openApiDoc,
-    // theme: 'purple', // optional: 'alternate' | 'default' | 'moon' | 'purple' | 'solarized'
-  }),
-);
-
-app.use(helmet());
-app.use(compression());
-app.use(corsMiddleware);
+app.use("/api/docs", apiReference({ content: openApiDoc }));
 
 app.all("/api/auth/{*any}", toNodeHandler(auth));
 app.use("/api/v1/webhooks/sanity", sanityWebhookRouter);
