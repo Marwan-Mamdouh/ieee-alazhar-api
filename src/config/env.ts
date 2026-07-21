@@ -8,7 +8,9 @@ const envSchema = z.object({
   FRONTEND_URL: z.url(),
   MONGO_URI: z.string(),
   MONGO_DB_NAME: z.string().optional(),
-  BETTER_AUTH_SECRET: z.string(),
+  BETTER_AUTH_SECRET: z
+    .string()
+    .min(32, "BETTER_AUTH_SECRET must be at least 32 characters"),
   BETTER_AUTH_URL: z.url(),
   CLOUDINARY_CLOUD_NAME: z.string(),
   CLOUDINARY_API_KEY: z.string(),
