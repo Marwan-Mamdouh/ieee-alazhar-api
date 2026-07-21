@@ -155,9 +155,9 @@ router.delete(
 
 router.patch(
   "/:boardId/avatar",
-  rateLimitMiddleware,
   isAuthenticated,
   isAdmin,
+  rateLimitMiddleware,
   upload.single("avatar"),
   verifyImageBytes,
   validate(boardIdSchema, "params"),
