@@ -33,7 +33,7 @@ export const httpCache = (options: CacheOptions) => {
 
         case "public":
           // Public data. CDNs and browsers can cache it.
-          res.setHeader("Cache-Control", `public no-cache`);
+          res.setHeader("Cache-Control", `public, no-cache`);
           break;
       }
 
