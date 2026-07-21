@@ -19,11 +19,13 @@ import {
   type PaginationParams,
 } from "../../util/zod.config.js";
 import { httpCache } from "../../middlewares/http.caching.js";
+import { generalRateLimitMiddleware } from "../../middlewares/rateLimiting.middleware.js";
 
 const router = Router();
 
 router.post(
   "/",
+  generalRateLimitMiddleware,
   validate(createFeedbackSchema, "body"),
   asyncHandler(async (req: TypedRequest<CreateFeedbackDTO>, res: Response) => {
     await feedbackService.createFeedback(req.validatedBody!);
@@ -35,6 +37,7 @@ router.get(
   "/",
   isAuthenticated,
   isAdmin,
+  generalRateLimitMiddleware,
   validate(paginationSchema, "query"),
   httpCache({ strategy: "no-store" }),
   asyncHandler(
@@ -52,6 +55,7 @@ router.patch(
   "/:id/status",
   isAuthenticated,
   isAdmin,
+  generalRateLimitMiddleware,
   validate(feedbackIdSchema, "params"),
   validate(updateFeedbackStatusSchema, "body"),
   asyncHandler(
@@ -73,6 +77,7 @@ router.delete(
   "/:id",
   isAuthenticated,
   isAdmin,
+  generalRateLimitMiddleware,
   validate(feedbackIdSchema, "params"),
   asyncHandler(
     async (req: TypedRequest<unknown, FeedbackId>, res: Response) => {
