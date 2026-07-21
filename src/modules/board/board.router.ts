@@ -15,6 +15,7 @@ import type { TypedRequest } from "../../types/TypedRequest.js";
 import asyncHandler from "../../util/async.handler.js";
 import boardService from "./board.service.js";
 import { isAuthenticated } from "../../middlewares/isAuthenticated.js";
+import { isAdmin } from "../../middlewares/isAdmin.js";
 import upload from "../../middlewares/upload.js";
 import { httpCache } from "../../middlewares/http.caching.js";
 import { CACHE_KEYS, TTL, getCachedData } from "../../infra/cache/cache.js";
@@ -100,6 +101,7 @@ router.get(
 router.post(
   "/",
   isAuthenticated,
+  isAdmin,
   rateLimitMiddleware,
   upload.single("avatar"),
   validate(addBoardMemberSchema),
@@ -117,6 +119,7 @@ router.post(
 router.patch(
   "/:boardId",
   isAuthenticated,
+  isAdmin,
   upload.single("avatar"),
   validate(boardIdSchema, "params"),
   validate(updateBoardMemberSchema, "body"),
@@ -137,6 +140,7 @@ router.patch(
 router.delete(
   "/:boardId",
   isAuthenticated,
+  isAdmin,
   validate(boardIdSchema, "params"),
   asyncHandler(async (req: TypedRequest<unknown, BoardId>, res: Response) => {
     const { boardId } = req.validatedParams!;
@@ -150,6 +154,7 @@ router.patch(
   "/:boardId/avatar",
   rateLimitMiddleware,
   isAuthenticated,
+  isAdmin,
   upload.single("avatar"),
   validate(boardIdSchema, "params"),
   asyncHandler(async (req: TypedRequest<unknown, BoardId>, res: Response) => {
@@ -166,6 +171,7 @@ router.patch(
 router.delete(
   "/:boardId/avatar",
   isAuthenticated,
+  isAdmin,
   validate(boardIdSchema, "params"),
   asyncHandler(async (req: TypedRequest<unknown, BoardId>, res: Response) => {
     const { boardId } = req.validatedParams!;
