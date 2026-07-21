@@ -2,6 +2,7 @@ import { Router, type Response } from "express";
 
 import asyncHandler from "../../util/async.handler.js";
 import { isAuthenticated } from "../../middlewares/isAuthenticated.js";
+import { isAdmin } from "../../middlewares/isAdmin.js";
 import { validate } from "../../middlewares/validate.js";
 import {
   createFeedbackSchema,
@@ -33,6 +34,7 @@ router.post(
 router.get(
   "/",
   isAuthenticated,
+  isAdmin,
   validate(paginationSchema, "query"),
   httpCache({ strategy: "public" }),
   asyncHandler(
@@ -49,6 +51,7 @@ router.get(
 router.patch(
   "/:id/status",
   isAuthenticated,
+  isAdmin,
   validate(feedbackIdSchema, "params"),
   validate(updateFeedbackStatusSchema, "body"),
   asyncHandler(
@@ -69,6 +72,7 @@ router.patch(
 router.delete(
   "/:id",
   isAuthenticated,
+  isAdmin,
   validate(feedbackIdSchema, "params"),
   asyncHandler(
     async (req: TypedRequest<unknown, FeedbackId>, res: Response) => {
