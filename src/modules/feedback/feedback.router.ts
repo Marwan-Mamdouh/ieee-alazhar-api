@@ -36,7 +36,7 @@ router.get(
   isAuthenticated,
   isAdmin,
   validate(paginationSchema, "query"),
-  httpCache({ strategy: "public" }),
+  httpCache({ strategy: "no-store" }),
   asyncHandler(
     async (
       req: TypedRequest<unknown, unknown, PaginationParams>,
