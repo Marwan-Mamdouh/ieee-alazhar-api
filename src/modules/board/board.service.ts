@@ -125,13 +125,16 @@ const boardService = {
       board.avatar = { url: result.secure_url, public_id: result.public_id };
     }
     try {
-      const newMember = await board.save();
+      const newMember = await board.save().catch((err) => {
+        console.error({ event: "board.save.failed", err });
+        throw new AppError("Failed to save board member", 500);
+      });
       return toMemberDTO(newMember);
     } catch (err) {
       if (memberAvatar && board.avatar?.public_id) {
         await UploadService.deleteImage(board.avatar.public_id);
       }
-      throw new AppError(`Failed to save board member: ${err}`);
+      throw new AppError("Failed to save board member", 500);
     }
   },
 
@@ -192,17 +195,18 @@ const boardService = {
     board.avatar = { url: result.secure_url, public_id: result.public_id };
 
     try {
-      const savedMember = await board.save();
+      const savedMember = await board.save().catch((err) => {
+        console.error({ event: "board.avatar.save.failed", err });
+        throw new AppError("Failed to save board member", 500);
+      });
       return toMemberDTO(savedMember);
     } catch (err) {
       try {
         await UploadService.deleteImage(result.public_id);
       } catch (cleanupErr) {
-        throw new AppError(
-          `Board save failed AND cleanup failed: ${cleanupErr}`,
-        );
+        throw new AppError(`Board save failed AND cleanup failed`, 500);
       }
-      throw new AppError(`Failed to save board avatar: ${err}`);
+      throw new AppError("Failed to save board avatar", 500);
     }
   },
 
