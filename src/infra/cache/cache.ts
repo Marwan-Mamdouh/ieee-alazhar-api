@@ -43,6 +43,12 @@ export const CACHE_KEYS = {
   // GET /home
   homeData: () => `home:data`,
   homePattern: () => `home:*`,
+
+  // GET /forms/:slug (public form definition — hammered during registrations)
+  formBySlug: (slug: string) => `forms:slug:${slug}`,
+
+  // Wildcard for invalidating a single form's cached copy
+  formPattern: (slug: string) => `forms:*${slug}*`,
 } as const;
 
 const cacheKeyPrefix = "cache:";
@@ -57,6 +63,10 @@ export const TTL = {
   EVENTS_LIST: 60 * 60 * 24, // webhook handles invalidation now
   EVENT_BY_ID: 60 * 60 * 24, // webhook handles invalidation now
   HOME_DATA: 60 * 60 * 24, // webhook handles invalidation now
+  // Public form definition. Mutations invalidate immediately via FORM_UPDATED;
+  // submissions do NOT invalidate, so 300s bounds capacity staleness
+  // (currentSubmissionCount) between cache refreshes.
+  FORM_BY_SLUG: 60 * 5,
 } as const;
 
 // ─── Core Cache Helpers ──────────────────────────────────────────────────────

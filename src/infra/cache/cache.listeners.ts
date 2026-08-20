@@ -50,5 +50,15 @@ export const registerCacheListeners = (): void => {
     await invalidateByPattern(CACHE_KEYS.homePattern());
   });
 
+  // Any form mutation changes the public form definition the frontend renders
+  // (title, fields, status, time window, capacity) → invalidate that slug's cache.
+  appEmitter.onEvent(CACHE_EVENTS.FORM_UPDATED, async ({ slug }) => {
+    await invalidateByPattern(CACHE_KEYS.formPattern(slug));
+  });
+
+  appEmitter.onEvent(CACHE_EVENTS.FORM_DELETED, async ({ slug }) => {
+    await invalidateByPattern(CACHE_KEYS.formPattern(slug));
+  });
+
   console.log("[Cache] Listeners registered");
 };

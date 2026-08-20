@@ -11,6 +11,8 @@ import feedbackRouter from "./modules/feedback/feedback.router.js";
 import committeesRouter from "./modules/committees/committees.router.js";
 import eventsRouter from "./modules/events/events.route.js";
 import homeRouter from "./modules/home/home.router.js";
+import formRouter from "./modules/forms/form/form.router.js";
+import submissionRouter from "./modules/forms/submission/submission.router.js";
 import corsMiddleware from "./middlewares/corsMiddleware.js";
 import logger from "./middlewares/logger.js";
 import auth from "./util/auth.js";
@@ -71,6 +73,8 @@ app.use("/api/v1/feedback", feedbackRouter);
 app.use("/api/v1/committees", committeesRouter);
 app.use("/api/v1/events", eventsRouter);
 app.use("/api/v1/home", homeRouter);
+app.use("/api/v1/forms", formRouter);
+app.use("/api/v1/forms", submissionRouter);
 
 app.use((_, res: Response) => {
   res.status(404).json({ message: "Endpoint not found." });
