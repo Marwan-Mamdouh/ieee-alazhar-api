@@ -1,4 +1,5 @@
 import cors from "cors";
+import type { NextFunction, Request, Response } from "express";
 import { ForbiddenError } from "../errors/app.error.js";
 
 const allowedOrigins = new Set([
@@ -8,14 +9,18 @@ const allowedOrigins = new Set([
   // "http://localhost:4173",
 ]);
 
-const corsMiddleware = cors({
-  origin: (origin, cb) => {
-    if (!origin || allowedOrigins.has(origin)) cb(null, true);
-    else cb(new ForbiddenError("Not allowed by CORS"));
-  },
-  methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
-  credentials: true,
-  allowedHeaders: ["Content-Type", "Authorization"],
-});
+const corsMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  cors({
+    origin: (origin, cb) => {
+      if (!origin) return cb(null, true);
+      const sameOrigin = new URL(origin).host === req.get("host");
+      if (sameOrigin || allowedOrigins.has(origin)) return cb(null, true);
+      return cb(new ForbiddenError("Not allowed by CORS"));
+    },
+    methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })(req, res, next);
+};
 
 export default corsMiddleware;
