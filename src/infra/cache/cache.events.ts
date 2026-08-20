@@ -10,6 +10,8 @@ export const CACHE_EVENTS = {
   SANITY_COMMITTEES_UPDATED: "sanity:committees:updated",
   SANITY_EVENTS_UPDATED: "sanity:events:updated",
   SANITY_HOME_UPDATED: "sanity:home:updated",
+  FORM_UPDATED: "form:updated",
+  FORM_DELETED: "form:deleted",
 } as const;
 
 type CacheEvent = (typeof CACHE_EVENTS)[keyof typeof CACHE_EVENTS];
@@ -24,6 +26,8 @@ interface CacheEventPayloads {
   [CACHE_EVENTS.SANITY_COMMITTEES_UPDATED]: Record<string, never>;
   [CACHE_EVENTS.SANITY_EVENTS_UPDATED]: Record<string, never>;
   [CACHE_EVENTS.SANITY_HOME_UPDATED]: Record<string, never>;
+  [CACHE_EVENTS.FORM_UPDATED]: { slug: string };
+  [CACHE_EVENTS.FORM_DELETED]: { slug: string };
 }
 
 class AppEventEmitter extends EventEmitter {
