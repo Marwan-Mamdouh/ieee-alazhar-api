@@ -17,7 +17,7 @@ export const generateOpenAPIDocument = async () => {
 	const mySpec = generator.generateDocument({
 		openapi: "3.0.0",
 		info: { title: "IEEE Board API", version: "1.0.0" },
-		servers: [{ url: "/api" }],
+		servers: [{ url: "/" }],
 	});
 
 	const authSpec = await auth.api.generateOpenAPISchema();
