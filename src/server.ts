@@ -56,8 +56,28 @@ const openApiDoc = await generateOpenAPIDocument();
 // Serve the raw JSON spec (Scalar needs a URL to fetch from)
 app.get("/openapi.json", (_, res) => res.json(openApiDoc));
 
-// Serve the Scalar UI
-app.use("/api/docs", apiReference({ content: openApiDoc }));
+// Serve the Scalar UI.
+// Scalar's HTML loads the bundle from a CDN and runs an inline init script,
+// both of which helmet's default CSP (script-src 'self') blocks. Override the
+// CSP for THIS route only — the rest of the API keeps the strict default.
+app.use(
+  "/api/docs",
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "https://cdn.jsdelivr.net", "'unsafe-inline'"],
+      styleSrc: ["'self'", "https:", "'unsafe-inline'"],
+      imgSrc: ["'self'", "https:", "data:"],
+      fontSrc: ["'self'", "https:", "data:"],
+      connectSrc: ["'self'", "https://cdn.jsdelivr.net"],
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+      frameAncestors: ["'self'"],
+      formAction: ["'self'"],
+    },
+  }),
+  apiReference({ content: openApiDoc }),
+);
 
 app.all("/api/auth/{*any}", toNodeHandler(auth));
 app.use("/api/v1/webhooks/sanity", sanityWebhookRouter);
