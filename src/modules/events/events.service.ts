@@ -8,7 +8,7 @@ const eventsService = {
       *[_type == "event"] | order(startDate desc) {
         _id, title, slug, location, subtitle,
         startDate, endDate, startDateSecondV, endDateSecondV,
-        registrationLink, coverImage { asset -> { url } }
+        registrationLink, formSlug, coverImage { asset -> { url } }
       }`);
   },
 
@@ -19,7 +19,7 @@ const eventsService = {
         speakers[] { name, title, photo { asset -> { url } } },
         memories[] { photo { asset -> { url } } },
         startDate, endDate, startDateSecondV, endDateSecondV,
-        registrationLink, coverImage { asset -> { url } }
+        registrationLink, formSlug, coverImage { asset -> { url } }
       }`,
       { id },
     );
