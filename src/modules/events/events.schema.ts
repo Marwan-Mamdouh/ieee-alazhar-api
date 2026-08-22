@@ -32,6 +32,10 @@ export const sanityEventSummarySchema = z
       .url()
       .optional()
       .openapi({ example: "https://forms.gle/..." }),
+    formSlug: z
+      .string()
+      .optional()
+      .openapi({ example: "ieee-spring-2026" }),
     coverImage: sanityImageSchema.optional(),
   })
   .openapi("SanityEventSummary");
