@@ -9,6 +9,7 @@ import "../modules/events/events.docs.js";
 import "../modules/home/home.docs.js";
 import "../modules/forms/form/form.docs.js";
 import "../modules/forms/submission/submission.docs.js";
+import "../modules/admin/forms/admin.forms.docs.js";
 import auth from "../util/auth.js";
 
 export const generateOpenAPIDocument = async () => {
