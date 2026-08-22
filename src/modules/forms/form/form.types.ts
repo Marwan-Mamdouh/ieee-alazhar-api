@@ -17,6 +17,7 @@ export const FIELD_TYPES = [
   "radio",
   "checkbox",
   "date",
+  "committeeSelector",
 ] as const;
 export type FieldType = (typeof FIELD_TYPES)[number];
 

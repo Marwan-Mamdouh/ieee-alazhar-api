@@ -31,7 +31,7 @@ const fieldErrorMessagesSchema = z.object({
 // -----------------------------------------------------------------------
 
 /** Field types that require an options array. */
-const CHOICE_TYPES = new Set(["select", "radio", "checkbox"]);
+const CHOICE_TYPES = new Set(["select", "radio", "checkbox", "committeeSelector"]);
 
 /** Field types that support minLength / maxLength / pattern. */
 const STRING_TYPES = new Set(["text", "textarea", "tel", "email"]);
@@ -318,7 +318,7 @@ export const reorderFieldsSchema = z.object({
  * let the submission pass — better than crashing the compiler.
  */
 function buildFieldZodSchema(field: IFieldDefinition): z.ZodTypeAny {
-  const { type, validation: v, errorMessages: em, options, required } = field;
+  const { type, validation: v = {}, errorMessages: em = {}, options, required } = field;
 
   let schema: z.ZodTypeAny;
 
@@ -417,6 +417,33 @@ function buildFieldZodSchema(field: IFieldDefinition): z.ZodTypeAny {
       schema = z.coerce.date({
         error: em.required ?? "This field is required",
       });
+      break;
+    }
+
+    case "committeeSelector": {
+      // Submission value is an array of { section, committee, role } objects.
+      // `options` contains the allowed role values (admin-configured).
+      // Section and committee are validated as non-empty strings here;
+      // the frontend enforces valid section→committee combos via cascading selects.
+      const first = options[0];
+      const roleSchema =
+        first !== undefined
+          ? z.enum([first, ...options.slice(1)] as [string, ...string[]], {
+              error: em.required ?? "Please select a role",
+            })
+          : z.string({ error: em.required ?? "Please select a role" });
+
+      const entrySchema = z.object({
+        section: z.enum(["officer", "technical", "branding", "operation"], {
+          error: "Section must be officer, technical, branding, or operation",
+        }),
+        committee: z.string().min(1, "Committee is required"),
+        role: roleSchema,
+      });
+
+      schema = z.array(entrySchema, {
+        error: em.required ?? "At least one committee affiliation is required",
+      }).min(1, em.required ?? "At least one committee affiliation is required");
       break;
     }
 
