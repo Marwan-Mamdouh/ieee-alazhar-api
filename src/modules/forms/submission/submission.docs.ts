@@ -3,7 +3,7 @@ import { registry } from "../../../util/registry.js";
 import { slugParamsSchema } from "../form/form.schema.js";
 
 // -----------------------------------------------------------------------
-// Output schemas — mirror the submission document / service return shapes
+// Output schema — mirrors the submission document
 // -----------------------------------------------------------------------
 
 const submissionSchema = z.object({
@@ -15,29 +15,8 @@ const submissionSchema = z.object({
   submittedAt: z.coerce.date(),
 });
 
-const submissionListSchema = z.object({
-  submissions: z.array(submissionSchema),
-  total: z.number().int(),
-  page: z.number().int(),
-  limit: z.number().int(),
-  totalPages: z.number().int(),
-});
-
-const exportSchema = z.object({
-  formTitle: z.string(),
-  columns: z.array(
-    z.object({
-      key: z.string(),
-      label: z.string(),
-      isSystem: z.boolean(),
-    }),
-  ),
-  submissions: z.array(submissionSchema),
-  total: z.number().int(),
-});
-
 // -----------------------------------------------------------------------
-// Routes
+// Routes — public only
 // -----------------------------------------------------------------------
 
 registry.registerPath({
@@ -71,52 +50,6 @@ registry.registerPath({
     404: { description: "Form not found" },
     409: { description: "Registration is full or email already submitted" },
     410: { description: "Form is closed or deadline passed" },
-    500: { description: "Internal server error" },
-  },
-});
-
-registry.registerPath({
-  method: "get",
-  path: "/api/v1/forms/{slug}/submissions",
-  tags: ["Form Submissions"],
-  summary: "List submissions for a form (admin, paginated)",
-  security: [{ cookieAuth: [] }],
-  request: {
-    params: slugParamsSchema,
-  },
-  responses: {
-    200: {
-      description: "Paginated submissions, newest first",
-      content: {
-        "application/json": { schema: submissionListSchema },
-      },
-    },
-    401: { description: "Unauthorized" },
-    403: { description: "Admin access required" },
-    404: { description: "Form not found" },
-    500: { description: "Internal server error" },
-  },
-});
-
-registry.registerPath({
-  method: "get",
-  path: "/api/v1/forms/{slug}/submissions/export",
-  tags: ["Form Submissions"],
-  summary: "Export all submissions for a form (admin, CSV-friendly)",
-  security: [{ cookieAuth: [] }],
-  request: {
-    params: slugParamsSchema,
-  },
-  responses: {
-    200: {
-      description: "Column definitions plus all submissions keyed by field.key",
-      content: {
-        "application/json": { schema: exportSchema },
-      },
-    },
-    401: { description: "Unauthorized" },
-    403: { description: "Admin access required" },
-    404: { description: "Form not found" },
     500: { description: "Internal server error" },
   },
 });
