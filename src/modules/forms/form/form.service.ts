@@ -5,6 +5,7 @@ import {
   type IFieldDefinition,
   type IFieldValidation,
   type IFieldErrorMessages,
+  type IForm,
   type FormStatus,
 } from "./form.types.js";
 import type {
@@ -46,6 +47,20 @@ function labelToKey(label: string): string {
     .replace(/_+/g, "_")
     .replace(/^_+/, "");
 }
+
+// -----------------------------------------------------------------------
+// Options
+// -----------------------------------------------------------------------
+
+export interface GetFormOptions {
+  includePrivateData?: boolean;
+}
+
+// Public-safe field type — validation and errorMessages stripped
+type PublicField = Omit<IFieldDefinition, "validation" | "errorMessages">;
+
+// Public-safe form type — fields without validation/errorMessages
+type PublicForm = Omit<IForm, "fields"> & { fields: PublicField[] };
 
 // -----------------------------------------------------------------------
 // State machine
@@ -120,13 +135,35 @@ async function createForm(input: CreateFormInput, createdBy: Types.ObjectId) {
   });
 }
 
-async function getFormBySlug(slug: string) {
+async function getFormBySlug(
+  slug: string,
+  options: { includePrivateData: true },
+): Promise<IForm & { _id: Types.ObjectId }>;
+async function getFormBySlug(
+  slug: string,
+  options?: GetFormOptions,
+): Promise<IForm & { _id: Types.ObjectId } | PublicForm>;
+async function getFormBySlug(
+  slug: string,
+  options?: GetFormOptions,
+): Promise<IForm & { _id: Types.ObjectId } | PublicForm> {
   // Read-through caching lives in the router (getCachedData on form:${slug}).
   // Mutations emit FORM_UPDATED / FORM_DELETED events from the router,
   // which invalidate the cached copy — this function stays a pure DB read.
   const form = await FormModel.findOne({ slug }).lean();
   if (!form) throw new NotFoundError("Form");
-  return form;
+
+  if (options?.includePrivateData) {
+    return form;
+  }
+
+  // Public-safe: strip validation and errorMessages from fields.
+  // These are internal to the server (used for submission validation)
+  // and are never exposed to the public API.
+  return {
+    ...form,
+    fields: form.fields.map(({ validation, errorMessages, ...rest }) => rest),
+  };
 }
 
 async function listForms() {

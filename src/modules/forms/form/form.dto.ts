@@ -41,9 +41,16 @@ export const toPublicFormDTO = (
   // opensAt/closesAt are Date | string because the public GET serves the
   // Redis-cached copy, where JSON serialization has already turned them
   // into ISO strings. Coerce defensively so the time-window math is correct.
-  form: Omit<IForm, "opensAt" | "closesAt"> & {
+  form: {
+    slug: string;
+    title: string;
+    description?: string;
+    status: FormStatus;
     opensAt?: Date | string;
     closesAt?: Date | string;
+    fields: PublicFormFieldDTO[];
+    submissionLimit: number | null;
+    currentSubmissionCount: number;
   },
 ): PublicFormDTO => {
   const now = new Date();
@@ -67,19 +74,7 @@ export const toPublicFormDTO = (
     slug: form.slug,
     title: form.title,
     status: form.status,
-    fields: [...form.fields]
-      .sort((a, b) => a.order - b.order)
-      .map((f) => ({
-        key: f.key,
-        type: f.type,
-        label: f.label,
-        required: f.required,
-        order: f.order,
-        options: f.options,
-        isSystem: f.isSystem,
-        ...(f.placeholder !== undefined && { placeholder: f.placeholder }),
-        ...(f.helpText !== undefined && { helpText: f.helpText }),
-      })),
+    fields: [...form.fields].sort((a, b) => a.order - b.order),
     submittable,
     capacityReached,
     ...(form.description !== undefined && { description: form.description }),
