@@ -9,7 +9,7 @@
 | `npm run typecheck` | Type-check only (`tsc --noEmit`)       |
 | `npm start`         | Run compiled app from `dist/server.js` |
 
-No lint, test, or formatter scripts exist. `npm run typecheck` is the only local verification. CI (`.github/workflows/ci.yml`) runs `npm audit`, `npm ci`, and `npm run typecheck` on push/PR to `master`.
+No lint, test, or formatter scripts exist. `npm run typecheck` is the only local verification. CI (`.github/workflows/ci.yml`) runs `npm audit --audit-level=high`, `npm ci`, and `npm run typecheck` on push/PR to `master`. CD (`.github/workflows/cd.yml`) deploys to Vercel on push to `master` (uses `vercel build --prod` + `vercel deploy --prebuilt --prod`). CI uses Node 24.x.
 
 ## Architecture
 
