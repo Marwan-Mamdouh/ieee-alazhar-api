@@ -12,7 +12,7 @@ const auth = betterAuth({
   database: mongodbAdapter(client.db("IEEE"), { client }),
   emailAndPassword: { enabled: true, disableSignUp: true },
   rateLimit: { window: 60 * 5, max: 10 },
-  baseUrl: env.FRONTEND_URL,
+  baseUrl: env.BETTER_AUTH_URL,
   trustedOrigins: [env.FRONTEND_URL, `http://localhost:5173`],
   plugins: [
     admin(),
